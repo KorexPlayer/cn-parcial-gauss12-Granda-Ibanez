@@ -1,3 +1,7 @@
+import os
+
+carpeta_proyecto = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 def cargar_datos():
     matriz = []
     archivo = open("datos/matriz_a.csv")
