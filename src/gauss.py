@@ -153,6 +153,8 @@ def eliminacion_gaussiana(matriz, vector, con_pivoteo):
     resultado["comparaciones_escalas"] = comparaciones_escalas
     resultado["multiplicador_maximo"] = multiplicador_maximo
     resultado["factor_crecimiento"] = mayor_visto / mayor_original
+    resultado["multiplicadores"] = multiplicadores
+    resultado["traza"] = traza
     return resultado
 
 def sustitucion_regresiva(matriz_triangular, vector_nuevo):
