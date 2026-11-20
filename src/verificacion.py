@@ -1,4 +1,5 @@
 import os
+import math
 from decimal import Decimal, getcontext
 from fractions import Fraction
 
@@ -81,4 +82,20 @@ def calcular_error_relativo_inf(x_aprox, x_exacta):
     diffs = [abs(Decimal(str(x_aprox[i])) - (Decimal(x_exacta[i].numerator) / Decimal(x_exacta[i].denominator))) for i in range(len(x_aprox))]
     normas_x = [abs(Decimal(x_exacta[i].numerator) / Decimal(x_exacta[i].denominator)) for i in range(len(x_aprox))]
     return max(diffs) / max(normas_x)
+
+def contar_digitos_significativos(x_val, x_frac):
+    """Determina cuántos dígitos significativos son correctos comparando con la solución exacta."""
+    x_exacta_dec = Decimal(x_frac.numerator) / Decimal(x_frac.denominator)
+    x_aprox_dec = Decimal(str(x_val))
+
+    if x_exacta_dec == 0:
+        return 16 if x_aprox_dec == 0 else 0
+
+    err_rel = abs(x_aprox_dec - x_exacta_dec) / abs(x_exacta_dec)
+    if err_rel == 0:
+        return 16
+    # Cantidad de dígitos significativos correctos: -log10(error_relativo)
+    digitos = math.floor(-float(err_rel.ln() / Decimal(10).ln()))
+    return max(0, min(16, digitos))
+
 
