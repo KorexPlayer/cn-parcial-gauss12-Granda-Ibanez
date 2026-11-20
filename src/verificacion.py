@@ -75,3 +75,10 @@ def calcular_residuo_extendido(A_str, b_str, x):
 
     norma_inf = max(abs(val) for val in r_dec)
     return r_dec, norma_inf
+
+def calcular_error_relativo_inf(x_aprox, x_exacta):
+    """Calcula ||x_aprox - x_exacta||_inf / ||x_exacta||_inf en precisión extendida."""
+    diffs = [abs(Decimal(str(x_aprox[i])) - (Decimal(x_exacta[i].numerator) / Decimal(x_exacta[i].denominator))) for i in range(len(x_aprox))]
+    normas_x = [abs(Decimal(x_exacta[i].numerator) / Decimal(x_exacta[i].denominator)) for i in range(len(x_aprox))]
+    return max(diffs) / max(normas_x)
+
