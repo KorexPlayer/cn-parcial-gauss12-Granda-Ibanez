@@ -210,8 +210,6 @@ O sea, F7 está a una perturbación chiquita de ser combinación lineal de F3 y 
  
 ## 7. Resultados
  
-Solución final: corrida con **pivoteo parcial escalado + 1 pasada de refinamiento iterativo** (`resultados/solucion.csv`).
- 
 Valores de `resultados/solucion.csv`, corrida con pivoteo parcial escalado. La columna "sin refinar" se escribe solo con los dígitos que afirmamos correctos (comparados contra la solución exacta con `fractions`). La columna "refinado" es tras una pasada de refinamiento iterativo, con error relativo de 6.0×10⁻¹⁷ (sección 8).
 
 | Incógnita | Valor sin refinar | Dígitos afirmados | Valor refinado |
@@ -230,9 +228,6 @@ Valores de `resultados/solucion.csv`, corrida con pivoteo parcial escalado. La c
 | x₁₂ | −1.0849371625 | 12 | −1.0849371625 |
 
 Todas superan los 8 dígitos mínimos. Las peores son x₃ y x₆ (10 dígitos), las incógnitas más chicas.
-Después del refinamiento, todas las incógnitas tienen **más de 16 dígitos** correctos comparando con la solución exacta (el peor queda en 16.1). Como un `float64` guarda ≈ 15.95 dígitos, afirmamos **15**, que es lo que podemos defender sin pasarnos. Los valores se ven "redondos" porque la solución verdadera del sistema tiene 10 cifras y los dígitos siguientes son ceros.
- 
-Sin refinar, la misma corrida ya tenía entre **10.1** (x₃, x₆) y **13.1** (x₁) dígitos correctos (tabla de la sección 5).
  
 ## 8. Verificación
  
