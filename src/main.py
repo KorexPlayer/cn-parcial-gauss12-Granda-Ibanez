@@ -1,5 +1,6 @@
 import gauss as gs
 import conteo as ct
+import verificacion as vf
 import os
 carpeta_proyecto = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,6 +21,8 @@ def main():
 
     # Generar reporte de FLOPs
     ct.generar_reporte_flops(resultado_sin_pivoteo, resultado_con_pivoteo, n)
+    # Ejecutar verificación, refinamiento y guardar solucion.csv y residuo.txt
+    vf.ejecutar_verificacion(resultado_sin_pivoteo, resultado_con_pivoteo)
 
 if __name__ == "__main__":
     main()
