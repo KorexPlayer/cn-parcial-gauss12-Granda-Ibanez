@@ -127,12 +127,13 @@ def ejecutar_verificacion(sin_pivoteo, con_pivoteo):
 
     # 2. Refinamiento iterativo (1 pasada reutilizando L y U de la corrida con pivoteo)
     r_con_float = [float(val) for val in r_con]
-    d = gs.resolver_con_lu(
+    resultado_lu = gs.resolver_con_lu(
         con_pivoteo["multiplicadores"],
         con_pivoteo["matriz_triangular"],
         con_pivoteo["orden_filas"],
         r_con_float,
     )
+    d = resultado_lu[0] if isinstance(resultado_lu, tuple) else resultado_lu
     x_refinada = [x_con[i] + d[i] for i in range(n)]
     r_ref, norm_r_ref = calcular_residuo_extendido(A_str, b_str, x_refinada)
     err_rel_ref = calcular_error_relativo_inf(x_refinada, x_exacta)
