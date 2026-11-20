@@ -277,9 +277,8 @@ a(1,1) = 1.34×10⁻⁸ genera multiplicadores de 10¹³ y destruye entre 10 y 1
  
 | Cosa | Versión |
 |---|---|
-| Python | ___ (`python --version`) |
-| numpy | ___ |
-| mpmath | ___ |
+| Python | >=3.10 (`python --version`) |
+| numpy | >=1.24.0 |
 | Comando | `pip install -r requirements.txt` y luego `python src/main.py` |
  
 `python src/main.py` genera todo `resultados/`: `solucion.csv`, `traza_eliminacion.txt`, `conteo_flops.md` y `residuo.txt`.
