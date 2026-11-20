@@ -1,4 +1,3 @@
-import numpy as np
 import os
 
 carpeta_proyecto = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -11,8 +10,8 @@ def calcular_cotas_teoricas(n):
 
 def resumir_estrategia(resultado_dict):
     """Extrae y consolida los contadores desde el diccionario devuelto por resolver() en gauss.py."""
-    md_elim = np.sum(resultado_dict["multdiv_por_paso"])
-    sr_elim = np.sum(resultado_dict["sumres_por_paso"])
+    md_elim = sum(resultado_dict["multdiv_por_paso"])
+    sr_elim = sum(resultado_dict["sumres_por_paso"])
     total_elim = md_elim + sr_elim  #Suma de multiplicaciones/divisiones y sumas/restas en la fase de eliminación gaussiana
 
     md_reg = resultado_dict["multdiv_regresiva"]
@@ -24,11 +23,11 @@ def resumir_estrategia(resultado_dict):
     total_flops = resultado_dict["total_flops"] #Guarda el total de operaciones de punto flotante (flops) calculadas en la función resolver().
 
     # Sobrecostos de estabilidad (pivoteo parcial escalado)
-    comp_busqueda = np.sum(resultado_dict["comparaciones_por_paso"])
+    comp_busqueda = sum(resultado_dict["comparaciones_por_paso"])
     comp_escalas = resultado_dict["comparaciones_escalas"]
     total_comparaciones = comp_busqueda + comp_escalas
-    div_escala = np.sum(resultado_dict["divisiones_escala_por_paso"])
-    total_intercambios = np.sum(resultado_dict["intercambios_por_paso"])
+    div_escala = sum(resultado_dict["divisiones_escala_por_paso"])
+    total_intercambios = sum(resultado_dict["intercambios_por_paso"])
 
     return {
         "md_elim": md_elim,                                                 #MultiDiv eliminacion gaussiana
