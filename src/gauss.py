@@ -162,7 +162,8 @@ def eliminacion_gaussiana(matriz, vector, con_pivoteo):
         for fila in range(tamano):
             foto_vector.append(vector_copia[fila])
         traza.append([foto_matriz, foto_vector, orden_filas[fila_pivote] + 1])
-
+    for fila in range(tamano):      # la diagonal de L son unos
+        multiplicadores[fila][fila] = 1.0
     resultado = {}
     resultado["matriz_triangular"] = matriz_copia
     resultado["vector_nuevo"] = vector_copia
