@@ -32,13 +32,11 @@ Que entrega .csv y .txt correspondientes:
 ```
 cn-parcial-gauss12-Granda-Ibanez/
 ├─ datos/        # matriz A y vector b sin truncar
-├─ src/          # código: gauss, conteo, verificación y main
-├─ resultados/   # todo lo que genera main.py
+├─ src/          # gauss, conteo, verificación y main
+├─ resultados/   # todo lo que genera el ejecutable main.py
 ├─ informe.md    # análisis completo
-└─ readme.md     # este archivo
+└─ readme.md     # este mismo archivo
 ```
-
-## Resultado resumido
 
 ## Resultado resumido
 
