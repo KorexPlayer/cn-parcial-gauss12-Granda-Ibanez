@@ -180,6 +180,53 @@ def sustitucion_regresiva(matriz_triangular, vector_nuevo):
 
     return incognitas, multdiv, sumres
 
+
+def resolver_con_lu(multiplicadores, matriz_triangular, orden_filas, vector_otro):
+    # resuelve con OTRO vector reutilizando L y U (sin volver a eliminar)
+    tamano = len(matriz_triangular)
+
+    vector_ordenado = []        # pongo el vector en el mismo orden de filas
+    for fila in range(tamano):
+        vector_ordenado.append(vector_otro[orden_filas[fila]])
+
+    for fila in range(tamano):      # sustitucion hacia adelante con L
+        for columna in range(fila):
+            vector_ordenado[fila] = vector_ordenado[fila] - multiplicadores[fila][columna] * vector_ordenado[columna]
+
+    incognitas, multdiv, sumres = sustitucion_regresiva(matriz_triangular, vector_ordenado)
+    return incognitas
+
+def resolver(matriz, vector, con_pivoteo):
+    # junta todo: elimina, despeja y suma el total de flops
+    resultado = eliminacion_gaussiana(matriz, vector, con_pivoteo)
+    incognitas, multdiv, sumres = sustitucion_regresiva(resultado["matriz_triangular"], resultado["vector_nuevo"])
+    resultado["incognitas"] = incognitas
+    resultado["multdiv_regresiva"] = multdiv
+    resultado["sumres_regresiva"] = sumres
+
+    total = multdiv + sumres
+    for paso in range(len(matriz) - 1):
+        total = total + resultado["multdiv_por_paso"][paso] + resultado["sumres_por_paso"][paso]
+    resultado["total_flops"] = total
+    return resultado
+
+def escribir_traza(resultado, titulo, archivo):
+    archivo.write("=" * 80 + "\n")
+    archivo.write(titulo + "\n")
+    archivo.write("=" * 80 + "\n")
+    numero_paso = 1
+    for foto_matriz, foto_vector, fila_original in resultado["traza"]:
+        archivo.write("\n--- Paso " + str(numero_paso) + " (pivote = fila original " + str(fila_original) + ")\n")
+        for fila in range(len(foto_matriz)):
+            linea = ""
+            for columna in range(len(foto_matriz)):
+                linea = linea + f"{foto_matriz[fila][columna]: .16e} "
+            linea = linea + "| " + f"{foto_vector[fila]: .16e}"
+            archivo.write(linea + "\n")
+        numero_paso = numero_paso + 1
+    archivo.write("\n")
+    
+
 if __name__ == "__main__":
     matriz, vector = cargar_datos()
 
