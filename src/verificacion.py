@@ -2,6 +2,8 @@ import os
 from decimal import Decimal, getcontext
 from fractions import Fraction
 
+# Configuramos 50 dígitos de precisión decimal para el residuo y el refinamiento
+getcontext().prec = 50
 
 carpeta_proyecto = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -56,3 +58,20 @@ def resolver_exacto_fractions(A_str, b_str):
         x_exacta[i] = suma / A[i][i]
 
     return x_exacta
+
+def calcular_residuo_extendido(A_str, b_str, x):
+    """
+    Calcula r = b - A*x usando Decimal de 50 dígitos y retorna r y su norma infinito.
+    """
+    n = len(A_str)
+    r_dec = []
+    for i in range(n):
+        suma_ax = Decimal(0)
+        for j in range(n):
+            # Convertimos float x[j] vía str() para capturar su valor exacto en punto flotante
+            suma_ax += Decimal(A_str[i][j]) * Decimal(str(x[j]))
+        ri = Decimal(b_str[i]) - suma_ax
+        r_dec.append(ri)
+
+    norma_inf = max(abs(val) for val in r_dec)
+    return r_dec, norma_inf
