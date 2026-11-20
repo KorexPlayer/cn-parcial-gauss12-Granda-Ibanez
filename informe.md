@@ -268,19 +268,19 @@ a(1,1) = 1.34×10⁻⁸ genera multiplicadores de 10¹³ y destruye entre 10 y 1
 - Equilibraríamos las filas una vez al inicio en vez de dividir por s(i) en cada búsqueda.
 - Estimaríamos κ con un método barato (tipo Hager) en vez de calcular todos los valores singulares.
 - La traza completa de cada paso ya no sería práctica: guardaríamos solo ρ, los pivotes y el multiplicador máximo por paso.
--- El residuo en precisión extendida con `Decimal` sería lento para n = 1000; lo calcularíamos con doble-doble o con precisión mixta.
+- El residuo en precisión extendida con `Decimal` sería lento para n = 1000; lo calcularíamos con doble-doble o con precisión mixta.
 ## 10. Reproducibilidad
  
 | Cosa | Versión |
 |---|---|
-| Python | >=3.10 (`python --version`) |
-| numpy | >=1.24.0 |
+| Python | 3.12.4 |
+| numpy | 2.3.1 |
 | Comando | `pip install -r requirements.txt` y luego `python src/main.py` |
  
 `python src/main.py` genera todo `resultados/`: `solucion.csv`, `traza_eliminacion.txt`, `conteo_flops.md` y `residuo.txt`.
  
 ### Uso de IA
-Usamos Claude (Anthropic) como apoyo para ___ (por ejemplo: organizar el trabajo, revisar el código y redactar partes del informe). Todo el código fue escrito, ejecutado y revisado por nosotros, y los números del informe salen de correr el programa.
+Usamos Claude (Anthropic) como apoyo para organizar el trabajo, guiar la escritura del código paso a paso y redactar el informe. Todo el código fue escrito, ejecutado y revisado por nosotros, y los números del informe salen de correr el programa.
  
 ### Fuentes
 - Enunciado de la Prueba Parcial «El pivote», Computación Numérica (INF-321), UCM, noviembre de 2026.
