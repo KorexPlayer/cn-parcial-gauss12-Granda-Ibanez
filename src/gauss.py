@@ -209,6 +209,7 @@ def sustitucion_regresiva(matriz_triangular, vector_nuevo):
 def resolver_con_lu(multiplicadores, matriz_triangular, orden_filas, vector_otro):
     # resuelve con OTRO vector reutilizando L y U (sin volver a eliminar)
     tamano = len(matriz_triangular)
+    flops = 0               # cuento lo que cuesta una pasada
 
     vector_ordenado = []        # pongo el vector en el mismo orden de filas
     for fila in range(tamano):
@@ -217,9 +218,12 @@ def resolver_con_lu(multiplicadores, matriz_triangular, orden_filas, vector_otro
     for fila in range(tamano):      # sustitucion hacia adelante con L
         for columna in range(fila):
             vector_ordenado[fila] = vector_ordenado[fila] - multiplicadores[fila][columna] * vector_ordenado[columna]
+            flops = flops + 2       # 1 multiplicacion + 1 resta
 
     incognitas, multdiv, sumres = sustitucion_regresiva(matriz_triangular, vector_ordenado)
-    return incognitas
+    flops = flops + multdiv + sumres
+
+    return incognitas, flops
 
 def resolver(matriz, vector, con_pivoteo):
     # junta todo: elimina, despeja y suma el total de flops
@@ -265,3 +269,6 @@ if __name__ == "__main__":
     escribir_traza(sin_pivoteo, "Corrida (i): sin pivoteo", archivo)
     escribir_traza(con_pivoteo, "Corrida (ii): pivoteo parcial escalado", archivo)
     archivo.close()
+
+    # pruebo que L y U sirven para resolver de nuevo sin eliminar otra vez
+    x_otra_vez, flops_pasada = resolver_con_lu(con_pivoteo["multiplicadores"], con_pivoteo["matriz_triangular"], con_pivoteo["orden_filas"], vector)
