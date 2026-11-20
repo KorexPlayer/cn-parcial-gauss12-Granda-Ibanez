@@ -24,9 +24,47 @@ def cargar_datos():
 
     return matriz, vector
 
+def eliminacion_gaussiana(matriz, vector):
+    tamano = len(matriz)
+
+    matriz_copia = []       # copio la matriz parte por parte
+    for fila in range(tamano):
+        filita_copia = []
+        for columna in range(tamano):
+            filita_copia.append(matriz[fila][columna])
+        matriz_copia.append(filita_copia)
+
+    vector_copia = []       # copio el vector numero por numero
+    for fila in range(tamano):
+        vector_copia.append(vector[fila])
+
+    for fila_pivote in range(tamano - 1):       # cada vueltita usa una fila como pivote
+        pivote = matriz_copia[fila_pivote][fila_pivote]
+
+        for fila_de_abajo in range(fila_pivote + 1, tamano):
+
+            numero_a_eliminar = matriz_copia[fila_de_abajo][fila_pivote]
+            multiplicador = numero_a_eliminar / pivote
+
+            matriz_copia[fila_de_abajo][fila_pivote] = 0.0      #este numero ya se queda en cero, lo pongo directo
+
+            for columna in range(fila_pivote + 1, tamano):      #esto actualiza el resto de la fila
+                numero_de_arriba = matriz_copia[fila_pivote][columna]
+                matriz_copia[fila_de_abajo][columna] = matriz_copia[fila_de_abajo][columna] - multiplicador * numero_de_arriba
+
+            vector_copia[fila_de_abajo] = vector_copia[fila_de_abajo] - multiplicador * vector_copia[fila_pivote]       #al vector le pasa exactamente lo mismo, con el mismo multiplicador
+
+    return matriz_copia, vector_copia
 
 if __name__ == "__main__":
     matriz, vector = cargar_datos()
-    print("Filas de la matriz:", len(matriz))
-    print("a(1,1) =", matriz[0][0])
-    print("b(1) =", vector[0])
+    matriz_triangular, vector_nuevo = eliminacion_gaussiana(matriz, vector)
+
+
+    cantidad_de_ceros = 0       # cuento los ceros que hay
+    for fila in range(12):
+        for columna in range(fila):
+            if matriz_triangular[fila][columna] == 0.0:
+                cantidad_de_ceros = cantidad_de_ceros + 1
+
+    print("Ceros bajo la diagonal:", cantidad_de_ceros)
