@@ -73,7 +73,7 @@ def calcular_residuo_extendido(A_str, b_str, x):
         suma_ax = Decimal(0)
         for j in range(n):
             # Convertimos float x[j] vía str() para capturar su valor exacto en punto flotante
-            suma_ax += Decimal(A_str[i][j]) * Decimal(str(x[j]))
+            suma_ax += Decimal(A_str[i][j]) * Decimal(float(x[j]))
         ri = Decimal(b_str[i]) - suma_ax
         r_dec.append(ri)
 
@@ -82,14 +82,14 @@ def calcular_residuo_extendido(A_str, b_str, x):
 
 def calcular_error_relativo_inf(x_aprox, x_exacta):
     """Calcula ||x_aprox - x_exacta||_inf / ||x_exacta||_inf en precisión extendida."""
-    diffs = [abs(Decimal(str(x_aprox[i])) - (Decimal(x_exacta[i].numerator) / Decimal(x_exacta[i].denominator))) for i in range(len(x_aprox))]
+    diffs = [abs(Decimal(float(x_aprox[i])) - (Decimal(x_exacta[i].numerator) / Decimal(x_exacta[i].denominator))) for i in range(len(x_aprox))]
     normas_x = [abs(Decimal(x_exacta[i].numerator) / Decimal(x_exacta[i].denominator)) for i in range(len(x_aprox))]
     return max(diffs) / max(normas_x)
 
 def contar_digitos_significativos(x_val, x_frac):
     """Determina cuántos dígitos significativos son correctos comparando con la solución exacta."""
     x_exacta_dec = Decimal(x_frac.numerator) / Decimal(x_frac.denominator)
-    x_aprox_dec = Decimal(str(x_val))
+    x_aprox_dec = Decimal(float(x_val))
 
     if x_exacta_dec == 0:
         return 16 if x_aprox_dec == 0 else 0
