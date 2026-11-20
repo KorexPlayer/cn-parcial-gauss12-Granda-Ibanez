@@ -265,15 +265,3 @@ if __name__ == "__main__":
     escribir_traza(sin_pivoteo, "Corrida (i): sin pivoteo", archivo)
     escribir_traza(con_pivoteo, "Corrida (ii): pivoteo parcial escalado", archivo)
     archivo.close()
-    print("Traza guardada en resultados/traza_eliminacion.txt")
-
-    for nombre, resultado in [["SIN PIVOTEO", sin_pivoteo], ["CON PIVOTEO ESCALADO", con_pivoteo]]:
-        print("==========", nombre, "==========")
-        print("Flops totales:", resultado["total_flops"])
-        print("Multiplicador maximo:", resultado["multiplicador_maximo"])
-        print("Factor de crecimiento:", resultado["factor_crecimiento"])
-        print("x1 =", resultado["incognitas"][0])
-
-    # pruebo que L y U sirven para resolver de nuevo sin eliminar otra vez
-    x_otra_vez = resolver_con_lu(con_pivoteo["multiplicadores"], con_pivoteo["matriz_triangular"], con_pivoteo["orden_filas"], vector)
-    print("Prueba L y U: x1 =", x_otra_vez[0])
