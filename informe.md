@@ -232,7 +232,7 @@ Todas superan los 8 dígitos mínimos. Las peores son x₃ y x₆ (10 dígitos),
 ## 8. Verificación
  
 ### Residuo en precisión extendida
-Calculamos r = b − Ax con **aritmética racional exacta** (`fractions.Fraction`), usando b con sus 20 dígitos y A desde el texto original, para que el residuo no se contamine con el redondeo del `float`.
+Calculamos r = b − Ax en **precisión extendida** (`Decimal` con 50 dígitos), usando A y b desde el texto original, para que el residuo no se contamine con el redondeo del `float`. La solución exacta de referencia se calcula con `fractions`.
  
 | Corrida | ‖r‖∞ |
 |---|---:|
@@ -252,12 +252,12 @@ Con el residuo exacto resolvemos **A·d = r reutilizando L y U** (`resolver_con_
 El error bajó unas **4000 veces**, pero el residuo **no bajó**. Esto no significa que empeoró: ‖r‖∞ lo domina la fila 6, que tiene escala 10⁶. Ahí, el solo hecho de guardar x en `float64` ya produce un residuo de ≈ s(6)·‖x‖·ε ≈ 10⁻¹⁰. O sea, llegamos al **piso de la doble precisión** y el residuo no puede bajar más aunque x sea casi exacta. Por eso el residuo solo, sin mirar el error, puede engañar.
  
 ### Control con biblioteca
-`numpy.linalg.solve` (que usa pivoteo parcial **sin** escalar) da un error relativo de 5.2×10⁻¹³ y un mínimo de **9.7 dígitos** correctos, un poco peor que nuestra corrida escalada (10.1). La diferencia máxima entre su x y la nuestra (sin refinar) es 8.2×10⁻¹³. Lo usamos **solo como control**: la solución reportada es la de nuestra implementación.
+`numpy.linalg.solve` (pivoteo parcial sin escalar) da un error relativo de 2.55×10⁻¹³ (`residuo.txt`), parecido al nuestro (2.36×10⁻¹³). Lo usamos solo como control: la solución reportada es la de nuestra implementación.
  
 ## 9. Conclusiones
  
 **¿Qué compromiso costo/exactitud elegimos y por qué?**
-Pivoteo parcial escalado + una pasada de refinamiento iterativo. La eliminación cuesta **1354 flops** (−8.9 % de la cota): un multiplicador por fila, sin volver a la subdiagonal y sin inversa. La estabilidad cuesta 198 comparaciones, 77 divisiones de escala y 8 intercambios, y no agrega ningún flop a la eliminación. A cambio, el peor dígito pasa de **7 a 10**, y con una pasada de refinamiento (276 flops más) llegamos al límite del `float64` (**15 dígitos**). La secuencia más barata (sin pivoteo) es justamente la que pierde ≈ 29 bits.
+Pivoteo parcial escalado + una pasada de refinamiento iterativo. La eliminación cuesta **1354 flops** (−8.9 % de la cota): un multiplicador por fila, sin volver a la subdiagonal y sin inversa. La estabilidad cuesta 198 comparaciones, 77 divisiones de escala y 8 intercambios, y no agrega ningún flop a la eliminación. A cambio, el peor dígito pasa de **7 a 10**, y con una pasada de refinamiento (276 flops más) llegamos al límite del `float64` (error 6.0×10⁻¹⁷). La secuencia más barata (sin pivoteo) es justamente la que pierde ≈ 29 bits.
  
 **¿Qué pasó con el pivote minúsculo?**
 a(1,1) = 1.34×10⁻⁸ genera multiplicadores de 10¹³ y destruye entre 10 y 13 bits por fila en el primer paso. No se puede aceptar aunque no sea cero: el sistema se resuelve igual, pero con la mitad de los dígitos malos.
@@ -268,7 +268,7 @@ a(1,1) = 1.34×10⁻⁸ genera multiplicadores de 10¹³ y destruye entre 10 y 1
 - Equilibraríamos las filas una vez al inicio en vez de dividir por s(i) en cada búsqueda.
 - Estimaríamos κ con un método barato (tipo Hager) en vez de calcular todos los valores singulares.
 - La traza completa de cada paso ya no sería práctica: guardaríamos solo ρ, los pivotes y el multiplicador máximo por paso.
-- El residuo exacto con `fractions` sería muy lento; usaríamos más precisión (por ejemplo `mpmath`) solo para el residuo.
+-- El residuo en precisión extendida con `Decimal` sería lento para n = 1000; lo calcularíamos con doble-doble o con precisión mixta.
 ## 10. Reproducibilidad
  
 | Cosa | Versión |
