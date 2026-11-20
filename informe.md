@@ -1,17 +1,15 @@
 # El pivote — Eliminación gaussiana con mínimo costo y máxima mantisa
 Prueba parcial Unidad nro 3 computación numérica.
  
-<!-- Lo que está con ___ hay que completarlo. Los números de las secciones 6 a 8 tienen que coincidir con lo que imprime verificacion.py de Carlos: revisarlos cuando él lo termine. -->
- 
 ## 1. Identificación
  
 | Campo | Detalle |
 |---|---|
-| Integrantes | Catalina Ibañez · Carlos Granda ___ |
+| Integrantes | Catalina Ibañez y Carlos Granda |
 | Asignatura | Computación Numérica (INF-321) — Ingeniería Civil Informática, UCM |
-| Docentes | Juan Manuel Cabezas Contardo · Pedro Pesante |
-| Sección | ___ |
-| Fecha | Talca, noviembre de 2026 |
+| Docente | Juan Manuel Cabezas Contardo |
+| Sección | 2 |
+| Fecha | Talca, 20 de noviembre de 2026 |
 | Repositorio | https://github.com/KorexPlayer/cn-parcial-gauss12-Granda-Ibanez |
  
 ### Objetivo
@@ -21,7 +19,7 @@ Resolver un sistema lineal denso de 12 incógnitas con eliminación gaussiana, c
 - **Máxima exactitud:** elegir el pivote y el orden de las operaciones para perder la menor cantidad posible de bits de mantisa.
 ## 2. Planteamiento
  
-En este trabajo resolvemos un sistema lineal **Ax = b** de 12 ecuaciones y 12 incógnitas usando eliminación gaussiana. La matriz A es **densa**: sus 144 elementos son distintos de cero, así que no hay ceros que nos permitan ahorrar operaciones. Cada elemento de A tiene 9 cifras significativas y el vector b viene con 20 dígitos. Todos se guardaron completos en `datos/matriz_a.csv` y `datos/vector_b.csv`, sin truncar.
+En este trabajo resolvemos un sistema lineal **Ax = b** de 12 ecuaciones y 12 incógnitas usando eliminación gaussiana. La matriz A es **densa**: sus 144 elementos son diferentes de cero, por lo que no existen ceros que nos ayuden a reducir operaciones. Cada elemento de A tiene 9 cifras significativas y el vector b viene con 20 dígitos. Todos se guardaron completos en `datos/matriz_a.csv` y `datos/vector_b.csv`, sin truncar.
  
 Trabajamos en doble precisión IEEE 754, que tiene 53 bits de mantisa (ε ≈ 2.22×10⁻¹⁶).
  
@@ -30,7 +28,7 @@ Trabajamos en doble precisión IEEE 754, que tiene 53 bits de mantisa (ε ≈ 2.
 | Indicador | Valor |
 |---|---|
 | Tamaño del sistema | n = 12 |
-| Elementos no nulos | 144 de 144 (densa) |
+| Elementos no nulos | 144 de 144 |
 | Cifras por elemento de A | 9 |
 | Dígitos de b | 20 |
 | Rango de magnitudes en A | 10⁻⁸ … 10⁶ |
@@ -59,7 +57,7 @@ Las filas impares son "pequeñas" (entre 10⁻⁵ y 10⁻²) y las pares son "gr
  
 ### Qué hace difícil este sistema
  
-1. **Escalas de fila incompatibles.** Cuando a una fila pequeña le restamos un múltiplo de una fila grande, el computador tiene que alinear los exponentes. En ese proceso, los bits más bajos del número pequeño se salen de los 53 bits de mantisa y se pierden para siempre.
+1. **Escalas de fila incompatibles.** El computador debe igualar los exponentes cuando a una fila pequeña se le resta un múltiplo de una fila grande. En ese procedimiento, los bits más bajos del número pequeño se escapan de los 53 bits de la mantisa y se extravían para siempre.
 2. **Pivote inicial minúsculo.** El primer pivote es a(1,1) = 1.3407×10⁻⁸. No solo es pequeño comparado con su columna (a(2,1) ≈ 1.19×10⁴), sino también dentro de su propia fila: a(1,1)/s(1) ≈ 1.45×10⁻⁴. Si lo usamos como pivote, los multiplicadores se vuelven gigantes.
 3. **Casi dependencia lineal oculta.** La fila 7 está muy cerca de ser una combinación de las filas 3 y 5. Por eso el número de condición es tan alto (κ₂ ≈ 3.08×10¹³) aunque la matriz no sea singular (sección 6).
 Por todo esto, el costo de este problema no está solo en los flops, sino también en los **bits de mantisa** que se pueden perder. Para ver ese efecto, comparamos dos corridas del mismo código: una **sin pivoteo** y otra con **pivoteo parcial escalado**.
