@@ -39,12 +39,11 @@ def eliminacion_gaussiana(matriz, vector):
         vector_copia.append(vector[fila])
 
     multdiv_por_paso = []       # contador de multiplicaciones y divisiones
-    sumres_por_paso = []        
+    sumres_por_paso = []        # contador de sumas y restas
     for paso in range(tamano - 1):
         multdiv_por_paso.append(0)
         sumres_por_paso.append(0)
-        
-        
+
     for fila_pivote in range(tamano - 1):       # cada vueltita usa una fila como pivote
         pivote = matriz_copia[fila_pivote][fila_pivote]
 
@@ -52,16 +51,21 @@ def eliminacion_gaussiana(matriz, vector):
 
             numero_a_eliminar = matriz_copia[fila_de_abajo][fila_pivote]
             multiplicador = numero_a_eliminar / pivote
+            multdiv_por_paso[fila_pivote] = multdiv_por_paso[fila_pivote] + 1      # conte 1 division
 
             matriz_copia[fila_de_abajo][fila_pivote] = 0.0      #este numero ya se queda en cero, lo pongo directo
 
             for columna in range(fila_pivote + 1, tamano):      #esto actualiza el resto de la fila
                 numero_de_arriba = matriz_copia[fila_pivote][columna]
                 matriz_copia[fila_de_abajo][columna] = matriz_copia[fila_de_abajo][columna] - multiplicador * numero_de_arriba
+                multdiv_por_paso[fila_pivote] = multdiv_por_paso[fila_pivote] + 1   # 1 multiplicacion
+                sumres_por_paso[fila_pivote] = sumres_por_paso[fila_pivote] + 1     # 1 resta
 
             vector_copia[fila_de_abajo] = vector_copia[fila_de_abajo] - multiplicador * vector_copia[fila_pivote]       #al vector le pasa exactamente lo mismo, con el mismo multiplicador
+            multdiv_por_paso[fila_pivote] = multdiv_por_paso[fila_pivote] + 1       # 1 multiplicacion
+            sumres_por_paso[fila_pivote] = sumres_por_paso[fila_pivote] + 1         # 1 resta
 
-    return matriz_copia, vector_copia
+    return matriz_copia, vector_copia, multdiv_por_paso, sumres_por_paso
 
 def sustitucion_regresiva(matriz_triangular, vector_nuevo):
     tamano = len(matriz_triangular)
