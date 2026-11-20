@@ -94,18 +94,24 @@ def sustitucion_regresiva(matriz_triangular, vector_nuevo):
 
 if __name__ == "__main__":
     matriz, vector = cargar_datos()
-    matriz_triangular, vector_nuevo = eliminacion_gaussiana(matriz, vector)
-
+    matriz_triangular, vector_nuevo, multdiv_por_paso, sumres_por_paso = eliminacion_gaussiana(matriz, vector)
 
     cantidad_de_ceros = 0       # cuento los ceros que hay
     for fila in range(12):
         for columna in range(fila):
             if matriz_triangular[fila][columna] == 0.0:
                 cantidad_de_ceros = cantidad_de_ceros + 1
-
     print("Ceros bajo la diagonal:", cantidad_de_ceros)
 
-    incognitas = sustitucion_regresiva(matriz_triangular, vector_nuevo)
+    incognitas, multdiv_regresiva, sumres_regresiva = sustitucion_regresiva(matriz_triangular, vector_nuevo)
+
+    total = 0
+    for paso in range(11):
+        total = total + multdiv_por_paso[paso] + sumres_por_paso[paso]
+        print("Paso", paso + 1, "multdiv =", multdiv_por_paso[paso], "sumres =", sumres_por_paso[paso])
+    print("Regresiva multdiv =", multdiv_regresiva, "sumres =", sumres_regresiva)
+    total = total + multdiv_regresiva + sumres_regresiva
+    print("Flops totales:", total)
 
     print("Solucion sin pivoteo:")
     for fila in range(12):
