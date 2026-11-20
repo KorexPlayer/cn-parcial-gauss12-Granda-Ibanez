@@ -141,6 +141,19 @@ def eliminacion_gaussiana(matriz, vector, con_pivoteo):
             multdiv_por_paso[fila_pivote] = multdiv_por_paso[fila_pivote] + 1       # 1 multiplicacion
             sumres_por_paso[fila_pivote] = sumres_por_paso[fila_pivote] + 1         # 1 resta
 
+
+        # foto de la matriz y el vector despues de este paso
+        foto_matriz = []
+        for fila in range(tamano):
+            filita = []
+            for columna in range(tamano):
+                filita.append(matriz_copia[fila][columna])
+            foto_matriz.append(filita)
+        foto_vector = []
+        for fila in range(tamano):
+            foto_vector.append(vector_copia[fila])
+        traza.append([foto_matriz, foto_vector, orden_filas[fila_pivote] + 1])
+
     resultado = {}
     resultado["matriz_triangular"] = matriz_copia
     resultado["vector_nuevo"] = vector_copia
