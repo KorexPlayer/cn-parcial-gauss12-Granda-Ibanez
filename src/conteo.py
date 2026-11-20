@@ -72,7 +72,7 @@ def generar_reporte_flops(sin_pivoteo, con_pivoteo, n=12):
 - **Barrido sin redundancia:** En el paso $k$, el recorrido de columnas comienza en $k+1$, sin tocar los elementos ya anulados bajo la diagonal.
 - **Sobrecosto de pivoteo parcial escalado:** Las comparaciones para obtener las escalas iniciales de fila, las comparaciones de búsqueda de pivote, las divisiones de escalamiento $|a_{i,k}| / s_i$ y los intercambios de filas se contabilizan por separado del costo base de eliminación.
 
-##2. Desglose paso a paso
+## 2. Desglose paso a paso
 
 | Etapa / Paso | Mult / Div | Sumas / Restas | Subtotal FLOPs | Comparaciones (Pivoteo) | Div. Escala (Pivoteo) | Intercambios (Swaps) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |\n""")
@@ -108,6 +108,7 @@ def generar_reporte_flops(sin_pivoteo, con_pivoteo, n=12):
 - **FLOPs aritméticos base medidos:** {res_sin['total_flops']} FLOPs (desviación de {desviacion_pct:+.2f}% respecto a la cota de referencia, dentro del margen $\\pm 10\\%$).
 
 ## 4. Comparación de corridas y sobrecosto de estabilidad
+
 | Indicador | Corrida (i): Sin pivoteo | Corrida (ii): Pivoteo parcial escalado |
 | :--- | :---: | :---: |
 | FLOPs aritméticos de eliminación + regresiva | {res_sin['total_flops']} | {res_con['total_flops']} |
