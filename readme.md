@@ -3,7 +3,7 @@ Resuelve un sistema lineal denso de 12 incógnitas con eliminación gaussiana, c
 
 ## Autoría
 - Catalina Ibañez
-- Carlos ___
+- Carlos Granda
 
 Computación Numérica (INF-321) · Ingeniería Civil Informática · UCM · 2026
 
