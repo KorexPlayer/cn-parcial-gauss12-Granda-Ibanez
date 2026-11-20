@@ -61,6 +61,7 @@ Las filas impares son "pequeñas" (entre 10⁻⁵ y 10⁻²) y las pares son "gr
 2. **Pivote inicial minúsculo.** El primer pivote es a(1,1) = 1.3407×10⁻⁸. No solo es pequeño comparado con su columna (a(2,1) ≈ 1.19×10⁴), sino también dentro de su propia fila: a(1,1)/s(1) ≈ 1.45×10⁻⁴. Si lo usamos como pivote, los multiplicadores se vuelven gigantes.
 3. **Casi dependencia lineal oculta.** La fila 7 está muy cerca de ser una combinación de las filas 3 y 5. Por eso el número de condición es tan alto (κ₂ ≈ 3.08×10¹³) aunque la matriz no sea singular (sección 6).
 Por todo esto, el costo de este problema no está solo en los flops, sino también en los **bits de mantisa** que se pueden perder. Para ver ese efecto, comparamos dos corridas del mismo código: una **sin pivoteo** y otra con **pivoteo parcial escalado**.
+
  
 ## 3. Estrategia de eliminación
  
@@ -202,7 +203,7 @@ La cota clásica dice que ‖δx‖/‖x‖ ≲ κ(A)·ε ≈ 6.85×10⁻³, o s
 2. **Gran parte de κ viene de las escalas, no de la matriz "en sí".** Si dividimos cada fila por su escala s(i) (equilibrar filas), el número de condición baja de 3.08×10¹³ a **≈ 8.1×10³**. Con ese κ, la cota da ≈ 8.1×10³ · 2.22×10⁻¹⁶ ≈ 1.8×10⁻¹² → **≈ 11–12 dígitos**, que calza con lo que obtuvimos. El pivoteo escalado trabaja justamente sobre esa parte.
 3. **El residuo decide.** La cota se construye con el peor caso; lo que de verdad dice cuán buena es la solución es el residuo y la comparación con la solución exacta (sección 8).
 ### Casi dependencia de la fila 7
-Ajustando F7 como combinación de F3 y F5 por mínimos cuadrados:
+Ajustando F7 como combinación de F3 y F5 por mínimos cuadrados (cálculo hecho aparte con numpy; no forma parte de `main.py`):
  
 **F7 ≈ 4.177 · F3 + 583.25 · F5**, con un residuo relativo de **2.3×10⁻³**.
  
@@ -241,7 +242,7 @@ Calculamos r = b − Ax en **precisión extendida** (`Decimal` con 50 dígitos),
 | Con pivoteo escalado (después de 1 refinamiento) | 2.60×10⁻¹⁰ |
  
 ### Refinamiento iterativo
-Con el residuo exacto resolvemos **A·d = r reutilizando L y U** (`resolver_con_lu`, sin volver a factorizar, **276 flops** por pasada), y corregimos x ← x + d.
+Con ese residuo resolvemos **A·d = r reutilizando L y U** (`resolver_con_lu`, sin volver a factorizar, **276 flops** por pasada), y corregimos x ← x + d.
  
 | | Antes | Después de 1 pasada |
 |---|---:|---:|
