@@ -5,11 +5,11 @@ carpeta_proyecto = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def main():
     n = 12  # Tamaño del sistema
-    A, b = gs.cargar_datos(n)
+    A, b = gs.cargar_datos()
 
-    resultado_sin_pivoteo = gs.resolver(A, b, pivoteo=False)
+    resultado_sin_pivoteo = gs.resolver(A, b, con_pivoteo=False)
 
-    resultado_con_pivoteo = gs.resolver(A, b, pivoteo=True)
+    resultado_con_pivoteo = gs.resolver(A, b, con_pivoteo=True)
 
     carpeta_resultados = os.path.join(carpeta_proyecto, "resultados")
     os.makedirs(carpeta_resultados, exist_ok=True)
