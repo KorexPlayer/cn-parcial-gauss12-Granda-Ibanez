@@ -1,0 +1,47 @@
+================================================================================
+VERIFICACIÓN EN PRECISIÓN EXTENDIDA, REFINAMIENTO Y CONDICIONAMIENTO
+================================================================================
+
+1. CONDICIONAMIENTO Y COTA DE DÍGITOS RECUPERABLES (C5)
+   - Número de condición kappa_2(A) : 3.084744e+13
+   - Épsilon de máquina (IEEE 754)  : 2.220446e-16
+   - Cota clásica kappa(A) * eps    : 6.849507e-03
+   - Dígitos garantizados por cota  : 2.16 dígitos (cota pesimista)
+
+2. COMPARACIÓN DE NORMAS DE RESIDUO ||r||_inf Y ERROR RELATIVO
+   - Sin pivoteo          -> ||r||_inf = 1.771478e-07 | Error rel. = 2.080260e-10
+   - Con pivoteo escalado -> ||r||_inf = 3.495802e-10 | Error rel. = 2.357604e-13
+   - Tras 1 refinamiento  -> ||r||_inf = 0.000000e+00 | Error rel. = 0.000000e+00
+   - Control NumPy solve  -> ||r||_inf = 7.790085e-11 | Error rel. = 2.547337e-13
+
+3. VECTOR RESIDUO r = b - Ax (CON PIVOTEO PARCIAL ESCALADO, 50 DÍGITOS)
+   r[ 1] = -8.579974352000000e-21
+   r[ 2] = -8.061571089000000e-12
+   r[ 3] = -4.502432362560000e-18
+   r[ 4] = +5.014444892890000e-12
+   r[ 5] = -8.174063374130000e-20
+   r[ 6] = +3.495802331740000e-10
+   r[ 7] = -1.333672170130000e-17
+   r[ 8] = +2.701263426030000e-11
+   r[ 9] = -2.245544224820000e-20
+   r[10] = -3.535175966660000e-12
+   r[11] = +9.919531996650000e-18
+   r[12] = +5.271133137050000e-11
+
+   Norma infinito ||r||_inf = 3.495802331740000e-10
+
+4. VECTOR RESIDUO TRAS REFINAMIENTO ITERATIVO (1 PASADA)
+   r_ref[ 1] = +0.000000000000000e-8
+   r_ref[ 2] = +0.000000000000000e+1
+   r_ref[ 3] = +0.000000000000000e-6
+   r_ref[ 4] = +0.000000000000000e+0
+   r_ref[ 5] = +0.000000000000000e-8
+   r_ref[ 6] = +0.000000000000000e+2
+   r_ref[ 7] = +0.000000000000000e-5
+   r_ref[ 8] = +0.000000000000000e+1
+   r_ref[ 9] = +0.000000000000000e-8
+   r_ref[10] = +0.000000000000000e+0
+   r_ref[11] = +0.000000000000000e-6
+   r_ref[12] = +0.000000000000000e+1
+
+   Norma infinito ||r_ref||_inf = 0.000000000000000e-8
