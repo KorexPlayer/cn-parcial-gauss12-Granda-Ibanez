@@ -67,16 +67,16 @@ def generar_reporte_flops(sin_pivoteo, con_pivoteo, n=12):
         # 1. Convención
         archivo.write("# Conteo de Operaciones (FLOPs)\n\n")
         archivo.write("""
-        ## 1. Convención de conteo
-        - **Unidad básica:** 1 FLOP = 1 operación aritmética elemental en punto flotante (`+`, `-`, `*`, `/`).
-        - **Reutilización de multiplicadores:** Cada multiplicador $m_{i,k} = a_{i,k}/a_{k,k}$ se calcula una única vez por fila (1 división) y se almacena en la matriz $L$ para reutilizarse en toda la fila, en el vector $b$ y en futuras sustituciones.
-        - **Barrido sin redundancia:** En el paso $k$, el recorrido de columnas comienza en $k+1$, sin tocar los elementos ya anulados bajo la diagonal.
-        - **Sobrecosto de pivoteo parcial escalado:** Las comparaciones para obtener las escalas iniciales de fila, las comparaciones de búsqueda de pivote, las divisiones de escalamiento $|a_{i,k}| / s_i$ y los intercambios de filas se contabilizan por separado del costo base de eliminación.
+## 1. Convención de conteo
+- **Unidad básica:** 1 FLOP = 1 operación aritmética elemental en punto flotante (`+`, `-`, `*`, `/`).
+- **Reutilización de multiplicadores:** Cada multiplicador $m_{i,k} = a_{i,k}/a_{k,k}$ se calcula una única vez por fila (1 división) y se almacena en la matriz $L$ para reutilizarse en toda la fila, en el vector $b$ y en futuras sustituciones.
+- **Barrido sin redundancia:** En el paso $k$, el recorrido de columnas comienza en $k+1$, sin tocar los elementos ya anulados bajo la diagonal.
+- **Sobrecosto de pivoteo parcial escalado:** Las comparaciones para obtener las escalas iniciales de fila, las comparaciones de búsqueda de pivote, las divisiones de escalamiento $|a_{i,k}| / s_i$ y los intercambios de filas se contabilizan por separado del costo base de eliminación.
 
-        ##2. Desglose paso a paso
+##2. Desglose paso a paso
 
-        | Etapa / Paso | Mult / Div | Sumas / Restas | Subtotal FLOPs | Comparaciones (Pivoteo) | Div. Escala (Pivoteo) | Intercambios (Swaps) |
-        | :--- | :---: | :---: | :---: | :---: | :---: | :---: |""")
+| Etapa / Paso | Mult / Div | Sumas / Restas | Subtotal FLOPs | Comparaciones (Pivoteo) | Div. Escala (Pivoteo) | Intercambios (Swaps) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |\n""")
 
         num_pasos = len(sin_pivoteo["multdiv_por_paso"])
         for paso in range(num_pasos):
@@ -103,21 +103,21 @@ def generar_reporte_flops(sin_pivoteo, con_pivoteo, n=12):
 
         # 3. Cotas y comparacion final
         archivo.write(f"""
-        ## 3. Comparación con cotas teóricas\n\n
-        - **Mínimo teórico clásico ($\\frac{{2}}{{3}}n^3$ para $n={n}$):** {minimo_teorico_a:.0f} FLOPs (solo matriz $A$).
-        - **Cota de referencia completa (guía T1):** ~{cota_guia} FLOPs.
-        - **FLOPs aritméticos base medidos:** {res_sin['total_flops']} FLOPs (desviación de {desviacion_pct:+.2f}% respecto a la cota de referencia, dentro del margen $\\pm 10\\%$).
+## 3. Comparación con cotas teóricas\n\n
+- **Mínimo teórico clásico ($\\frac{{2}}{{3}}n^3$ para $n={n}$):** {minimo_teorico_a:.0f} FLOPs (solo matriz $A$).
+- **Cota de referencia completa (guía T1):** ~{cota_guia} FLOPs.
+- **FLOPs aritméticos base medidos:** {res_sin['total_flops']} FLOPs (desviación de {desviacion_pct:+.2f}% respecto a la cota de referencia, dentro del margen $\\pm 10\\%$).
 
-        ## 4. Comparación de corridas y sobrecosto de estabilidad
-        | Indicador | Corrida (i): Sin pivoteo | Corrida (ii): Pivoteo parcial escalado |
-        | :--- | :---: | :---: |
-        | FLOPs aritméticos de eliminación + regresiva | {res_sin['total_flops']} | {res_con['total_flops']} |
-        | Comparaciones iniciales de escala ($s_i$) | 0 | {res_con['comp_escalas']} |
-        | Comparaciones de búsqueda de pivote | 0 | {res_con['comp_busqueda']} |
-        | Divisiones de escalamiento ($|a_{{i,k}}|/s_i$) | 0 | {res_con['div_escala']} |
-        | Intercambios de filas (swaps) | 0 | {res_con['total_intercambios']} |
-        | Multiplicador máximo ($\\max |m_{{i,k}}|$) | {res_sin['multiplicador_maximo']:.6e} | {res_con['multiplicador_maximo']:.6e} |
-        | Factor de crecimiento ($\\rho$) | {res_sin['factor_crecimiento']:.6e} | {res_con['factor_crecimiento']:.6e} |\n""")
+## 4. Comparación de corridas y sobrecosto de estabilidad
+| Indicador | Corrida (i): Sin pivoteo | Corrida (ii): Pivoteo parcial escalado |
+| :--- | :---: | :---: |
+| FLOPs aritméticos de eliminación + regresiva | {res_sin['total_flops']} | {res_con['total_flops']} |
+| Comparaciones iniciales de escala ($s_i$) | 0 | {res_con['comp_escalas']} |
+| Comparaciones de búsqueda de pivote | 0 | {res_con['comp_busqueda']} |
+| Divisiones de escalamiento ($|a_{{i,k}}|/s_i$) | 0 | {res_con['div_escala']} |
+| Intercambios de filas (swaps) | 0 | {res_con['total_intercambios']} |
+| Multiplicador máximo ($\\max |m_{{i,k}}|$) | {res_sin['multiplicador_maximo']:.6e} | {res_con['multiplicador_maximo']:.6e} |
+| Factor de crecimiento ($\\rho$) | {res_sin['factor_crecimiento']:.6e} | {res_con['factor_crecimiento']:.6e} |\n""")
 
     archivo.close()
 
