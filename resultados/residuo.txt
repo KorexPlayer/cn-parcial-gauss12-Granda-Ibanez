@@ -3,9 +3,9 @@ VERIFICACIÓN EN PRECISIÓN EXTENDIDA, REFINAMIENTO Y CONDICIONAMIENTO
 ================================================================================
 
 1. CONDICIONAMIENTO Y COTA DE DÍGITOS RECUPERABLES (C5)
-   - Número de condición kappa_2(A) : 3.084744e+13
+   - Número de condición kappa_2(A) : 3.084734e+13
    - Épsilon de máquina (IEEE 754)  : 2.220446e-16
-   - Cota clásica kappa(A) * eps    : 6.849507e-03
+   - Cota clásica kappa(A) * eps    : 6.849485e-03
    - Dígitos garantizados por cota  : 2.16 dígitos (cota pesimista)
 
 2. COMPARACIÓN DE NORMAS DE RESIDUO ||r||_inf Y ERROR RELATIVO
