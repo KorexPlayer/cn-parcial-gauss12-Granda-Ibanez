@@ -100,6 +100,7 @@ def eliminacion_gaussiana(matriz, vector, con_pivoteo):
     mayor_original = mayor_valor_absoluto(matriz_copia)
     mayor_visto = mayor_original        # para el factor de crecimiento
     multiplicador_maximo = 0.0
+    traza = []              # aqui guardo la matriz despues de cada paso
 
     for fila_pivote in range(tamano - 1):       # cada vueltita usa una fila como pivote
 
