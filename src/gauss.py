@@ -3,8 +3,11 @@ import os
 carpeta_proyecto = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def cargar_datos():
+    ruta_matriz = os.path.join(carpeta_proyecto, "datos", "matriz_a.csv")
+    ruta_vector = os.path.join(carpeta_proyecto, "datos", "vector_b.csv")
+
     matriz = []
-    archivo = open("datos/matriz_a.csv")
+    archivo = open(ruta_matriz)
     for linea in archivo:
         numeritos = linea.strip().split(",")
         filita = []
@@ -14,7 +17,7 @@ def cargar_datos():
     archivo.close()
 
     vector = []
-    archivo = open("datos/vector_b.csv")
+    archivo = open(ruta_vector)
     for linea in archivo:
         vector.append(float(linea.strip()))
     archivo.close()
