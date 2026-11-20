@@ -38,6 +38,13 @@ def eliminacion_gaussiana(matriz, vector):
     for fila in range(tamano):
         vector_copia.append(vector[fila])
 
+    multdiv_por_paso = []       # contador de multiplicaciones y divisiones
+    sumres_por_paso = []        
+    for paso in range(tamano - 1):
+        multdiv_por_paso.append(0)
+        sumres_por_paso.append(0)
+        
+        
     for fila_pivote in range(tamano - 1):       # cada vueltita usa una fila como pivote
         pivote = matriz_copia[fila_pivote][fila_pivote]
 
@@ -56,6 +63,26 @@ def eliminacion_gaussiana(matriz, vector):
 
     return matriz_copia, vector_copia
 
+def sustitucion_regresiva(matriz_triangular, vector_nuevo):
+    tamano = len(matriz_triangular)
+
+    incognitas = []                 # toda la x parte en 0
+    for fila in range(tamano):
+        incognitas.append(0.0)
+
+    fila = tamano - 1               # se parte desde la ultima fila por eso el -1
+    while fila >= 0:                # se sube hasta la primera
+        suma = vector_nuevo[fila]
+
+        for columna in range(fila + 1, tamano):     # resto las x que ya conozco
+            suma = suma - matriz_triangular[fila][columna] * incognitas[columna]
+
+        incognitas[fila] = suma / matriz_triangular[fila][fila]    # despejo la x de la fila
+
+        fila = fila - 1             # subo una fila
+
+    return incognitas
+
 if __name__ == "__main__":
     matriz, vector = cargar_datos()
     matriz_triangular, vector_nuevo = eliminacion_gaussiana(matriz, vector)
@@ -68,3 +95,9 @@ if __name__ == "__main__":
                 cantidad_de_ceros = cantidad_de_ceros + 1
 
     print("Ceros bajo la diagonal:", cantidad_de_ceros)
+
+    incognitas = sustitucion_regresiva(matriz_triangular, vector_nuevo)
+
+    print("Solucion sin pivoteo:")
+    for fila in range(12):
+        print("x" + str(fila + 1) + " =", incognitas[fila])
