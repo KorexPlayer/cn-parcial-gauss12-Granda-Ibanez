@@ -69,6 +69,8 @@ def eliminacion_gaussiana(matriz, vector):
 
 def sustitucion_regresiva(matriz_triangular, vector_nuevo):
     tamano = len(matriz_triangular)
+    multdiv = 0         # contador de multiplicaciones y divisiones
+    sumres = 0          # contador de sumas y restas
 
     incognitas = []                 # toda la x parte en 0
     for fila in range(tamano):
@@ -80,12 +82,15 @@ def sustitucion_regresiva(matriz_triangular, vector_nuevo):
 
         for columna in range(fila + 1, tamano):     # resto las x que ya conozco
             suma = suma - matriz_triangular[fila][columna] * incognitas[columna]
+            multdiv = multdiv + 1       # 1 multiplicacion
+            sumres = sumres + 1         # 1 resta
 
         incognitas[fila] = suma / matriz_triangular[fila][fila]    # despejo la x de la fila
+        multdiv = multdiv + 1           # 1 division
 
         fila = fila - 1             # subo una fila
 
-    return incognitas
+    return incognitas, multdiv, sumres
 
 if __name__ == "__main__":
     matriz, vector = cargar_datos()
