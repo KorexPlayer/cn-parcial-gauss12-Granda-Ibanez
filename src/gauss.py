@@ -111,6 +111,7 @@ def eliminacion_gaussiana(matriz, vector, con_pivoteo):
             if mejor_fila != fila_pivote:       # intercambio las filas
                 matriz_copia[fila_pivote], matriz_copia[mejor_fila] = matriz_copia[mejor_fila], matriz_copia[fila_pivote]
                 vector_copia[fila_pivote], vector_copia[mejor_fila] = vector_copia[mejor_fila], vector_copia[fila_pivote]
+                multiplicadores[fila_pivote], multiplicadores[mejor_fila] = multiplicadores[mejor_fila], multiplicadores[fila_pivote]
                 escalas[fila_pivote], escalas[mejor_fila] = escalas[mejor_fila], escalas[fila_pivote]
                 orden_filas[fila_pivote], orden_filas[mejor_fila] = orden_filas[mejor_fila], orden_filas[fila_pivote]
                 intercambios_por_paso[fila_pivote] = 1
