@@ -38,6 +38,13 @@ def eliminacion_gaussiana(matriz, vector):
     for fila in range(tamano):
         vector_copia.append(vector[fila])
 
+    multdiv_por_paso = []       # contador de multiplicaciones y divisiones
+    sumres_por_paso = []        
+    for paso in range(tamano - 1):
+        multdiv_por_paso.append(0)
+        sumres_por_paso.append(0)
+        
+        
     for fila_pivote in range(tamano - 1):       # cada vueltita usa una fila como pivote
         pivote = matriz_copia[fila_pivote][fila_pivote]
 
