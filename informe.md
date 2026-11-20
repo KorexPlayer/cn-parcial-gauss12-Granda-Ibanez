@@ -1,17 +1,15 @@
 # El pivote — Eliminación gaussiana con mínimo costo y máxima mantisa
 Prueba parcial Unidad nro 3 computación numérica.
  
-<!-- Lo que está con ___ hay que completarlo. Los números de las secciones 6 a 8 tienen que coincidir con lo que imprime verificacion.py de Carlos: revisarlos cuando él lo termine. -->
- 
 ## 1. Identificación
  
 | Campo | Detalle |
 |---|---|
-| Integrantes | Catalina Ibañez · Carlos Granda ___ |
+| Integrantes | Catalina Ibañez y Carlos Granda |
 | Asignatura | Computación Numérica (INF-321) — Ingeniería Civil Informática, UCM |
-| Docentes | Juan Manuel Cabezas Contardo · Pedro Pesante |
-| Sección | ___ |
-| Fecha | Talca, noviembre de 2026 |
+| Docente | Juan Manuel Cabezas Contardo |
+| Sección | 2 |
+| Fecha | Talca, 20 de noviembre de 2026 |
 | Repositorio | https://github.com/KorexPlayer/cn-parcial-gauss12-Granda-Ibanez |
  
 ### Objetivo
@@ -21,7 +19,7 @@ Resolver un sistema lineal denso de 12 incógnitas con eliminación gaussiana, c
 - **Máxima exactitud:** elegir el pivote y el orden de las operaciones para perder la menor cantidad posible de bits de mantisa.
 ## 2. Planteamiento
  
-En este trabajo resolvemos un sistema lineal **Ax = b** de 12 ecuaciones y 12 incógnitas usando eliminación gaussiana. La matriz A es **densa**: sus 144 elementos son distintos de cero, así que no hay ceros que nos permitan ahorrar operaciones. Cada elemento de A tiene 9 cifras significativas y el vector b viene con 20 dígitos. Todos se guardaron completos en `datos/matriz_a.csv` y `datos/vector_b.csv`, sin truncar.
+En este trabajo resolvemos un sistema lineal **Ax = b** de 12 ecuaciones y 12 incógnitas usando eliminación gaussiana. La matriz A es **densa**: sus 144 elementos son diferentes de cero, por lo que no existen ceros que nos ayuden a reducir operaciones. Cada elemento de A tiene 9 cifras significativas y el vector b viene con 20 dígitos. Todos se guardaron completos en `datos/matriz_a.csv` y `datos/vector_b.csv`, sin truncar.
  
 Trabajamos en doble precisión IEEE 754, que tiene 53 bits de mantisa (ε ≈ 2.22×10⁻¹⁶).
  
@@ -30,7 +28,7 @@ Trabajamos en doble precisión IEEE 754, que tiene 53 bits de mantisa (ε ≈ 2.
 | Indicador | Valor |
 |---|---|
 | Tamaño del sistema | n = 12 |
-| Elementos no nulos | 144 de 144 (densa) |
+| Elementos no nulos | 144 de 144 |
 | Cifras por elemento de A | 9 |
 | Dígitos de b | 20 |
 | Rango de magnitudes en A | 10⁻⁸ … 10⁶ |
@@ -59,7 +57,7 @@ Las filas impares son "pequeñas" (entre 10⁻⁵ y 10⁻²) y las pares son "gr
  
 ### Qué hace difícil este sistema
  
-1. **Escalas de fila incompatibles.** Cuando a una fila pequeña le restamos un múltiplo de una fila grande, el computador tiene que alinear los exponentes. En ese proceso, los bits más bajos del número pequeño se salen de los 53 bits de mantisa y se pierden para siempre.
+1. **Escalas de fila incompatibles.** El computador debe igualar los exponentes cuando a una fila pequeña se le resta un múltiplo de una fila grande. En ese procedimiento, los bits más bajos del número pequeño se escapan de los 53 bits de la mantisa y se extravían para siempre.
 2. **Pivote inicial minúsculo.** El primer pivote es a(1,1) = 1.3407×10⁻⁸. No solo es pequeño comparado con su columna (a(2,1) ≈ 1.19×10⁴), sino también dentro de su propia fila: a(1,1)/s(1) ≈ 1.45×10⁻⁴. Si lo usamos como pivote, los multiplicadores se vuelven gigantes.
 3. **Casi dependencia lineal oculta.** La fila 7 está muy cerca de ser una combinación de las filas 3 y 5. Por eso el número de condición es tan alto (κ₂ ≈ 3.08×10¹³) aunque la matriz no sea singular (sección 6).
 Por todo esto, el costo de este problema no está solo en los flops, sino también en los **bits de mantisa** que se pueden perder. Para ver ese efecto, comparamos dos corridas del mismo código: una **sin pivoteo** y otra con **pivoteo parcial escalado**.
@@ -118,7 +116,7 @@ En el paso k quedan r = 12 − k filas bajo el pivote. Cada una cuesta:
 - 1 división (el multiplicador),
 - r multiplicaciones y r restas (columnas k+1 a 12),
 - 1 multiplicación y 1 resta (el vector b).
-Por ejemplo, en el paso 1 (r = 11): mult/div = 11 × (1 + 11 + 1) = **143** y sum/res = 11 × (11 + 1) = **132**. ✓
+Por ejemplo, en el paso 1 (r = 11): mult/div = 11 × (1 + 11 + 1) = **143** y sum/res = 11 × (11 + 1) = **132**. 
  
 ### Comparación con la cota
  
@@ -127,7 +125,7 @@ Por ejemplo, en el paso 1 (r = 11): mult/div = 11 × (1 + 11 + 1) = **143** y su
 | Eliminación densa bien hecha | ≈ 1486 | 1354 | −8.9 % | Sí |
 | + pivoteo parcial escalado | ≈ 1486 + 66 comparaciones | 1354 + sobrecosto aparte | −8.9 % | Sí |
  
-La diferencia con 1486 es exactamente **132 flops** (66 multiplicaciones + 66 restas). La cota del enunciado incluye calcular a(i,k) − m·a(k,k) en la columna k. Nosotras no lo calculamos porque sabemos que da cero y lo asignamos directo: 1354 + 132 = 1486. Los flops son **los mismos en las dos corridas**, porque el pivoteo no agrega aritmética de eliminación.
+La diferencia con 1486 es exactamente **132 flops** (66 multiplicaciones + 66 restas). La cota del enunciado incluye calcular a(i,k) − m·a(k,k) en la columna k. Nosotros no lo calculamos porque sabemos que da cero y lo asignamos directo: 1354 + 132 = 1486. Los flops son **los mismos en las dos corridas**, porque el pivoteo no agrega aritmética de eliminación.
  
 ### Sobrecosto de estabilidad (contado aparte)
  
@@ -194,7 +192,7 @@ El pivoteo escalado no cambia los flops (1354 en las dos), pero reduce el factor
 |---|---|
 | κ₂(A) (con `numpy.linalg.cond`, solo como control) | 3.08×10¹³ |
 | Cota κ₂·ε | 6.85×10⁻³ |
-| Dígitos que garantiza la cota | ≈ 2 |
+| Dígitos que garantiza la cota | 2.16 |
 | Dígitos obtenidos con pivoteo (sin refinar) | entre 10.1 y 13.1 |
  
 La cota clásica dice que ‖δx‖/‖x‖ ≲ κ(A)·ε ≈ 6.85×10⁻³, o sea que **no garantiza ni 2 dígitos**. Pero en la práctica obtuvimos **10 dígitos** como mínimo con pivoteo escalado.
@@ -214,21 +212,24 @@ O sea, F7 está a una perturbación chiquita de ser combinación lineal de F3 y 
  
 Solución final: corrida con **pivoteo parcial escalado + 1 pasada de refinamiento iterativo** (`resultados/solucion.csv`).
  
-| Incógnita | Valor reportado | Dígitos correctos afirmados |
-|---|---|---:|
-| x₁ | 0.7384915627 | 15 |
-| x₂ | −1.2059374168 | 15 |
-| x₃ | 0.0043871952 | 15 |
-| x₄ | −0.0917264538 | 15 |
-| x₅ | 2.8461093725 | 15 |
-| x₆ | −0.0062815409 | 15 |
-| x₇ | 1.4738205916 | 15 |
-| x₈ | −0.0384927164 | 15 |
-| x₉ | 0.9152648037 | 15 |
-| x₁₀ | −2.6071394852 | 15 |
-| x₁₁ | 0.0518736294 | 15 |
-| x₁₂ | −1.0849371625 | 15 |
- 
+Valores de `resultados/solucion.csv`, corrida con pivoteo parcial escalado. La columna "sin refinar" se escribe solo con los dígitos que afirmamos correctos (comparados contra la solución exacta con `fractions`). La columna "refinado" es tras una pasada de refinamiento iterativo, con error relativo de 6.0×10⁻¹⁷ (sección 8).
+
+| Incógnita | Valor sin refinar | Dígitos afirmados | Valor refinado |
+|---|---|---:|---|
+| x₁ | 0.7384915626999 | 13 | 0.7384915627 |
+| x₂ | −1.2059374168 | 12 | −1.2059374168 |
+| x₃ | 0.0043871952 | 10 | 0.0043871952 |
+| x₄ | −0.0917264538 | 11 | −0.0917264538 |
+| x₅ | 2.8461093725 | 12 | 2.8461093725 |
+| x₆ | −0.006281540899 | 10 | −0.0062815409 |
+| x₇ | 1.4738205916 | 12 | 1.4738205916 |
+| x₈ | −0.0384927164 | 11 | −0.0384927164 |
+| x₉ | 0.9152648037 | 12 | 0.9152648037 |
+| x₁₀ | −2.6071394852 | 12 | −2.6071394852 |
+| x₁₁ | 0.0518736294 | 11 | 0.0518736294 |
+| x₁₂ | −1.0849371625 | 12 | −1.0849371625 |
+
+Todas superan los 8 dígitos mínimos. Las peores son x₃ y x₆ (10 dígitos), las incógnitas más chicas.
 Después del refinamiento, todas las incógnitas tienen **más de 16 dígitos** correctos comparando con la solución exacta (el peor queda en 16.1). Como un `float64` guarda ≈ 15.95 dígitos, afirmamos **15**, que es lo que podemos defender sin pasarnos. Los valores se ven "redondos" porque la solución verdadera del sistema tiene 10 cifras y los dígitos siguientes son ceros.
  
 Sin refinar, la misma corrida ya tenía entre **10.1** (x₃, x₆) y **13.1** (x₁) dígitos correctos (tabla de la sección 5).
