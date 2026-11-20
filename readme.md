@@ -1,26 +1,27 @@
 # El pivote — Gauss 12×12
-Resuelve un sistema lineal denso de 12 incógnitas con eliminación gaussiana, contando las operaciones y cuidando la mantisa.
+Resuelve un sistema lineal de 12 incógnitas con eliminación gaussiana, contando las operaciones y cuidando la mantisa.
 
 ## Autoría
 - Catalina Ibañez
 - Carlos Granda
 
-Computación Numérica (INF-321) · Ingeniería Civil Informática · UCM · 2026
+Computación Numérica (INF-321), Ingeniería Civil Informática, UCM, 2026
 
 ## Requisitos
-- Python ___ (3.10 o superior)
+- Python (3.10 o superior)
 - Instalar dependencias:
 ```
 pip install -r requirements.txt
 ```
 
 ## Ejecución
-Desde la carpeta raíz del proyecto:
+Desarrollamos una carpeta raíz para el proyecto:
 ```
 python src/main.py
 ```
+Que entrega .csv y .txt correspondientes: 
 
-| Archivo generado | Qué tiene |
+| Archivo generado | Qué es lo qué contiene |
 |---|---|
 | `resultados/solucion.csv` | las 12 incógnitas con todos sus dígitos |
 | `resultados/traza_eliminacion.txt` | la matriz después de cada uno de los 11 pasos |
@@ -39,27 +40,31 @@ cn-parcial-gauss12-Granda-Ibanez/
 
 ## Resultado resumido
 
-| Incógnita | Valor (10 dígitos) |
-|---|---|
-| x₁ | ___ |
-| x₂ | ___ |
-| x₃ | ___ |
-| x₄ | ___ |
-| x₅ | ___ |
-| x₆ | ___ |
-| x₇ | ___ |
-| x₈ | ___ |
-| x₉ | ___ |
-| x₁₀ | ___ |
-| x₁₁ | ___ |
-| x₁₂ | ___ |
+## Resultado resumido
+
+| Incógnita | Valor |
+|---|---:|
+| x₁ | 0.7384915627 |
+| x₂ | −1.2059374168 |
+| x₃ | 0.0043871952 |
+| x₄ | −0.0917264538 |
+| x₅ | 2.8461093725 |
+| x₆ | −0.0062815409 |
+| x₇ | 1.4738205916 |
+| x₈ | −0.0384927164 |
+| x₉ | 0.9152648037 |
+| x₁₀ | −2.6071394852 |
+| x₁₁ | 0.0518736294 |
+| x₁₂ | −1.0849371625 |
 
 | Total de flops | ‖r‖∞ |
-|---|---|
-| ___ | ___ |
+|---:|---:|
+| 1354 | 2.60×10⁻¹⁰ |
+
+Solución con pivoteo parcial escalado y una pasada de refinamiento iterativo.
 
 ## Informe
 El análisis completo está en [informe.md](informe.md).
 
 ## Uso
-Trabajo académico para la asignatura INF-321, UCM. Solo uso educativo.
+Trabajo académico para la asignatura INF-321, Computación númerica UCM. Solo uso educativo.
