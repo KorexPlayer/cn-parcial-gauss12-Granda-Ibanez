@@ -76,7 +76,13 @@ def eliminacion_gaussiana(matriz, vector, con_pivoteo):
     vector_copia = []       # copio el vector numero por numero
     for fila in range(tamano):
         vector_copia.append(vector[fila])
-
+    multiplicadores = []    # aqui guardo cada multiplicador (la matriz L)
+    for fila in range(tamano):
+        filita = []
+        for columna in range(tamano):
+            filita.append(0.0)
+        multiplicadores.append(filita)
+        
     orden_filas = []        # que fila original quedo en cada posicion
     for fila in range(tamano):
         orden_filas.append(fila)
