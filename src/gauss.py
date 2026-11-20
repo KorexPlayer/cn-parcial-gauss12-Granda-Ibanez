@@ -122,6 +122,7 @@ def eliminacion_gaussiana(matriz, vector, con_pivoteo):
             numero_a_eliminar = matriz_copia[fila_de_abajo][fila_pivote]
             multiplicador = numero_a_eliminar / pivote
             multdiv_por_paso[fila_pivote] = multdiv_por_paso[fila_pivote] + 1      # conte 1 division
+            multiplicadores[fila_de_abajo][fila_pivote] = multiplicador     # lo guardo para reutilizarlo
 
             if abs(multiplicador) > multiplicador_maximo:
                 multiplicador_maximo = abs(multiplicador)
