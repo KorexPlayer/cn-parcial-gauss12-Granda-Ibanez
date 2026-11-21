@@ -33,11 +33,11 @@ La escala de cada fila es s(i) = max |a(i,j)| (`calcular_escalas` en `src/gauss.
  
 ### Qué hace difícil este sistema
  
-1. **Escalas de fila incompatibles.** El computador debe igualar los exponentes cuando a una fila pequeña se le resta un múltiplo de una fila grande. En ese procedimiento, los bits más bajos del número pequeño se escapan de los 53 bits de la mantisa y se extravían para siempre.
+1. **Escalas de fila incompatibles.** Cuando a una fila pequeña se le resta un múltiplo de una fila grande, el computador tiene que igualar los exponentes. En ese proceso, los bits más bajos del número pequeño quedan fuera de los 53 bits de la mantisa y se pierden para siempre.
 2. **Pivote inicial minúsculo.** El primer pivote es a(1,1) = 1.3407×10⁻⁸. No solo es pequeño comparado con su columna (a(2,1) ≈ 1.19×10⁴), sino también dentro de su propia fila: a(1,1)/s(1) ≈ 1.45×10⁻⁴. Si lo usamos como pivote, los multiplicadores se vuelven gigantes.
 3. **Casi dependencia lineal oculta.** La fila 7 está muy cerca de ser una combinación de las filas 3 y 5. Por eso el número de condición es tan alto (κ₂ ≈ 3.08×10¹³) aunque la matriz no sea singular (sección 6).
 
-Por todo esto, el costo de este problema no está solo en los flops, sino también en los **bits de mantisa** que se pueden perder. Para ver ese efecto, comparamos dos corridas del mismo código: una **sin pivoteo** y otra con **pivoteo parcial escalado**.
+Por todas estas razones, el costo de este problema no solo reside en los flops, sino también en los **bits de mantisa** que se pueden perder. Para observar ese efecto, analizamos dos ejecuciones del mismo código: una **sin pivoteo** y otra con **pivoteo parcial escalado**.
 
  
 ## 3. Estrategia de eliminación
@@ -89,7 +89,7 @@ Los números salen de contadores dentro de `src/gauss.py`, al lado de cada opera
  
 Por ejemplo, en el paso 1 hay 11 filas bajo el pivote: 11 × (1 + 11 + 1) = 143 mult/div y 11 × (11 + 1) = 132 sum/res. **Total: 1354 flops, −8.9 % de la cota ≈ 1486 (dentro del ±10 %).**
  
-La diferencia con 1486 es exactamente **132 flops** (66 multiplicaciones + 66 restas). La cota del enunciado incluye calcular a(i,k) − m·a(k,k) en la columna k. Nosotros no lo calculamos porque sabemos que da cero y lo asignamos directo: 1354 + 132 = 1486. Los flops son **los mismos en las dos corridas**, porque el pivoteo no agrega aritmética de eliminación.
+La diferencia con 1486 es precisamente **132 flops** (66 multiplicaciones y 66 restas). La cota del enunciado incluye el cálculo de a(i,k) − m·a(k,k) dentro de la columna k. Como sabemos que el resultado es cero, no lo calculamos y simplemente lo asignamos: 1354 + 132 = 1486. Los flops son **iguales en ambas corridas** debido a que el pivoteo no añade aritmética de eliminación.
  
 ### Sobrecosto de estabilidad (contado aparte)
  
@@ -101,7 +101,7 @@ La diferencia con 1486 es exactamente **132 flops** (66 multiplicaciones + 66 re
  
 ## 5. Análisis de mantisa y pivoteo
  
-Corrimos **el mismo código** dos veces, cambiando solo `con_pivoteo`. El error se mide contra la solución exacta del sistema, calculada con aritmética racional (`fractions`) a partir de los datos originales en texto.
+Ejecutamos **el mismo código** dos veces, con la única modificación de `con_pivoteo`. El error se evalúa en comparación con la solución exacta del sistema, que se determina con aritmética racional (`fractions`) a partir de la información original en texto.
  
 | Corrida | Multiplicador máximo | Factor de crecimiento ρ | Error relativo ‖x̂ − x‖∞ / ‖x‖∞ | Peor error por componente | Bits perdidos (peor componente) | Dígitos correctos (mínimo) |
 |---|---:|---:|---:|---:|---:|---:|
@@ -114,7 +114,7 @@ Corrimos **el mismo código** dos veces, cambiando solo `con_pivoteo`. El error 
 Las peores siempre son x₃ y x₆, que son las incógnitas más chicas (≈ 10⁻³): un mismo error absoluto pesa mucho más en ellas en términos relativos.
  
 ### ¿Por qué el pivote a(1,1) es inaceptable?
-Con a(1,1) = 1.3407×10⁻⁸ como pivote, los multiplicadores del paso 1 se disparan: el más grande es m(6,1) ≈ 2.75×10¹³. En la fila 6 se calcula a(6,j) − m·a(1,j), y el término m·a(1,j) llega a ≈ 2.5×10⁹, mientras que la fila 6 original vale como mucho 9.7×10⁵. Al alinear exponentes, los bits más bajos de la fila 6 se salen de los 53 bits de mantisa y **se pierden en ese solo paso, sin forma de recuperarlos**. Lo mismo pasa en las otras filas: en el paso 1 se pierden entre 10 y 13 bits por fila.
+Los multiplicadores del paso 1 se disparan, usando a(1,1) = 1.3407×10⁻⁸ como pivote; el mayor de ellos es m(6,1) ≈ 2.75×10¹³. En la fila 6, se calcula a(6,j) − m·a(1,j). El término m·a(1,j) alcanza aproximadamente 2.5×10⁹, en tanto que la fila 6 original tiene un valor máximo de 9.7×10⁵. Cuando se alinean los exponentes, los bits de menor valor de la fila 6 quedan fuera de los 53 bits de la mantisa y **se pierden en ese solo paso, sin posibilidad de recuperarlos**. En las demás filas ocurre lo mismo: en la primera etapa, se pierden entre 10 y 13 bits por fila.
  
 Después, la matriz crece unas 2.6×10³ veces (≈ 11 bits más) y el error se sigue acumulando. Al final se pierden ≈ 29 bits en el peor componente y solo quedan **7 dígitos correctos** en x₃ y x₆. Lo peligroso es que el sistema "se resuelve igual", porque ningún pivote es cero, y el resultado se ve razonable aunque tenga la mitad de los dígitos malos.
  
@@ -122,7 +122,7 @@ Después, la matriz crece unas 2.6×10³ veces (≈ 11 bits más) y el error se 
 Compara |a(i,k)|/s(i): en la columna 1, F1 tiene 1.45×10⁻⁴ (la peor) y F8 tiene 1.0, así que el primer pivote es **F8**. Orden de pivotes: F8, F2, F1, F6, F9, F11, F12, F5, F4, F10, F3, F7. La fila 7 (la casi dependiente) queda al final. Aunque el multiplicador máximo es 2.47×10⁹, es solo la razón entre escalas de fila: la matriz casi no crece (ρ = 1.78).
  
 ### Resumen de la comparación
-El pivoteo escalado no cambia los flops (1354 en las dos), pero reduce el factor de crecimiento de 2641 a 1.78 y el error relativo unas **880 veces** (de 2.08×10⁻¹⁰ a 2.36×10⁻¹³). Se pasa de 7 a 10 dígitos correctos en la peor incógnita: **≈ 3 dígitos ≈ 10 bits** recuperados, a cambio de 198 comparaciones, 77 divisiones de escala y 8 intercambios.
+El pivoteo escalado no altera los flops (1354 en ambos casos), pero disminuye el factor de crecimiento de 2641 a 1.78 y el error relativo en aproximadamente **880 veces** (de 2.08×10⁻¹⁰ a 2.36×10⁻¹³). En la incógnita más desfavorable, se va de 7 a 10 dígitos correctos: **≈ 3 dígitos ≈ 10 bits** recuperados, a costa de 198 comparaciones, 77 divisiones de escala y 8 intercambios.
  
 ## 6. Condicionamiento
  
@@ -136,14 +136,15 @@ El pivoteo escalado no cambia los flops (1354 en las dos), pero reduce el factor
 La cota clásica dice que ‖δx‖/‖x‖ ≲ κ(A)·ε ≈ 6.85×10⁻³, o sea que **no garantiza ni 2 dígitos**. Pero en la práctica obtuvimos **10 dígitos** como mínimo con pivoteo escalado.
  
 ### ¿Por qué la cota es pesimista aquí?
-1. **Es el peor caso.** La cota supone que los errores de redondeo se acomodan justo en la dirección que más se amplifica, y eso casi nunca pasa.
-2. **Gran parte de κ viene de las escalas, no de la matriz "en sí".** Si dividimos cada fila por su escala s(i) (equilibrar filas), el número de condición baja de 3.08×10¹³ a **≈ 8.1×10³**. Con ese κ, la cota da ≈ 8.1×10³ · 2.22×10⁻¹⁶ ≈ 1.8×10⁻¹² → **≈ 11–12 dígitos**, que calza con lo que obtuvimos. El pivoteo escalado trabaja justamente sobre esa parte.
+1. **Es el peor caso.** La cota asume que los errores de redondeo se ajustan exactamente en la dirección que más se magnifica, lo cual es muy poco probable.
+2. **La mayoría de κ se deriva de las escalas, no de la matriz "en sí".** Si se balancean las filas dividiendo cada una de ellas por su escala s(i), el número de condición disminuye de 3.08×10¹³ a **≈ 8.1×10³**. Con ese κ, la cota es aproximadamente igual a 8.1×10³ · 2.22×10⁻¹⁶, es decir, aproximadamente 1.8×10⁻¹², lo que corresponde a **aproximadamente 11-12 cifras**, que coincide con lo que conseguimos. El pivoteo escalado se ocupa precisamente de esa parte.
+
 ### Casi dependencia de la fila 7
 Ajustando F7 como combinación de F3 y F5 por mínimos cuadrados (cálculo hecho aparte con numpy; no forma parte de `main.py`):
  
 **F7 ≈ 4.177 · F3 + 583.25 · F5**, con un residuo relativo de **2.3×10⁻³**.
  
-O sea, F7 está a una perturbación chiquita de ser combinación lineal de F3 y F5. Eso hace que la matriz esté "casi" singular. El pivoteo escalado lo deja en evidencia solo: usa F7 como **último pivote**, y ese pivote final vale U(12,12) ≈ 1.57×10⁻⁴, apenas 2.5×10⁻³ de la escala de su fila (s(7) = 6.33×10⁻²), del mismo orden que el residuo del ajuste.
+Es decir, F7 está a una pequeña perturbación de ser una combinación lineal de F3 y F5. Eso hace que la matriz sea casi singular. El pivoteo escalado lo demuestra por sí solo: emplea F7 como **último pivote**, y este pivote final es U(12,12) ≈ 1.57×10⁻⁴, que es solo 2.5×10⁻³ de la escala de su fila (s(7) = 6.33×10⁻²), lo que equivale al mismo orden que el residuo del ajuste.
  
 ## 7. Resultados
  
