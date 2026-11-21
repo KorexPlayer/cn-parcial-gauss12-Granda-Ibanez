@@ -24,8 +24,6 @@ Trabajamos en doble precisión IEEE 754, que tiene 53 bits de mantisa (ε ≈ 2.
 |---|---|
 | Tamaño del sistema | n = 12 |
 | Elementos no nulos | 144 de 144 |
-| Cifras por elemento de A | 9 |
-| Dígitos de b | 20 |
 | Rango de magnitudes en A | 10⁻⁸ … 10⁶ |
 | det(A) | ≈ 1.3646×10⁹ (no singular) |
 | κ₂(A) | ≈ 3.08×10¹³ |
@@ -38,6 +36,7 @@ La escala de cada fila es s(i) = max |a(i,j)| (`calcular_escalas` en `src/gauss.
 1. **Escalas de fila incompatibles.** El computador debe igualar los exponentes cuando a una fila pequeña se le resta un múltiplo de una fila grande. En ese procedimiento, los bits más bajos del número pequeño se escapan de los 53 bits de la mantisa y se extravían para siempre.
 2. **Pivote inicial minúsculo.** El primer pivote es a(1,1) = 1.3407×10⁻⁸. No solo es pequeño comparado con su columna (a(2,1) ≈ 1.19×10⁴), sino también dentro de su propia fila: a(1,1)/s(1) ≈ 1.45×10⁻⁴. Si lo usamos como pivote, los multiplicadores se vuelven gigantes.
 3. **Casi dependencia lineal oculta.** La fila 7 está muy cerca de ser una combinación de las filas 3 y 5. Por eso el número de condición es tan alto (κ₂ ≈ 3.08×10¹³) aunque la matriz no sea singular (sección 6).
+
 Por todo esto, el costo de este problema no está solo en los flops, sino también en los **bits de mantisa** que se pueden perder. Para ver ese efecto, comparamos dos corridas del mismo código: una **sin pivoteo** y otra con **pivoteo parcial escalado**.
 
  
