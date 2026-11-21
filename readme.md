@@ -65,4 +65,4 @@ Solución con pivoteo parcial escalado y una pasada de refinamiento iterativo.
 El análisis completo está en [informe.md](informe.md).
 
 ## Uso
-Trabajo académico para la asignatura INF-321, Computación númerica UCM. Solo uso educativo.
+Trabajo académico para la asignatura INF-321, Computación numérica UCM. Solo uso educativo.
