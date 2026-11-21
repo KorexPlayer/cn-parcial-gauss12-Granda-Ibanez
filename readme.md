@@ -8,7 +8,7 @@ Resuelve un sistema lineal de 12 incógnitas con eliminación gaussiana, contand
 Computación Numérica (INF-321), Ingeniería Civil Informática, UCM, 2026
 
 ## Requisitos
-- Python (3.10 o superior)
+- Python (3.12.4 o superior)
 - Instalar dependencias:
 ```
 pip install -r requirements.txt

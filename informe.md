@@ -12,11 +12,6 @@ Prueba parcial Unidad nro 3 computación numérica.
 | Fecha | Talca, 20 de noviembre de 2026 |
 | Repositorio | https://github.com/KorexPlayer/cn-parcial-gauss12-Granda-Ibanez |
  
-### Objetivo
-Resolver un sistema lineal denso de 12 incógnitas con eliminación gaussiana, cumpliendo dos cosas que compiten entre sí:
- 
-- **Costo mínimo:** no pasarse del mínimo teórico de la eliminación densa.
-- **Máxima exactitud:** elegir el pivote y el orden de las operaciones para perder la menor cantidad posible de bits de mantisa.
 ## 2. Planteamiento
  
 En este trabajo resolvemos un sistema lineal **Ax = b** de 12 ecuaciones y 12 incógnitas usando eliminación gaussiana. La matriz A es **densa**: sus 144 elementos son diferentes de cero, por lo que no existen ceros que nos ayuden a reducir operaciones. Cada elemento de A tiene 9 cifras significativas y el vector b viene con 20 dígitos. Todos se guardaron completos en `datos/matriz_a.csv` y `datos/vector_b.csv`, sin truncar.
@@ -36,24 +31,7 @@ Trabajamos en doble precisión IEEE 754, que tiene 53 bits de mantisa (ε ≈ 2.
 | κ₂(A) | ≈ 3.08×10¹³ |
  
 ### Escalas de fila
-La escala de cada fila es su número más grande en valor absoluto, s(i) = max |a(i,j)|. Lo calcula la función `calcular_escalas` de `src/gauss.py`.
- 
-| Fila | Escala s(i) | Tipo de fila |
-|---|---:|---|
-| F1 | 9.27×10⁻⁵ | pequeña |
-| F2 | 9.96×10⁴ | grande |
-| F3 | 9.64×10⁻³ | pequeña |
-| F4 | 8.38×10³ | grande |
-| F5 | 8.05×10⁻⁵ | pequeña |
-| F6 | 9.67×10⁵ | grande |
-| F7 | 6.33×10⁻² | pequeña |
-| F8 | 8.30×10⁴ | grande |
-| F9 | 9.96×10⁻⁵ | pequeña |
-| F10 | 8.87×10³ | grande |
-| F11 | 9.74×10⁻³ | pequeña |
-| F12 | 9.84×10⁴ | grande |
- 
-Las filas impares son "pequeñas" (entre 10⁻⁵ y 10⁻²) y las pares son "grandes" (entre 10³ y 10⁶). Entre F5 y F6 hay casi **diez órdenes de magnitud** de diferencia.
+La escala de cada fila es s(i) = max |a(i,j)| (`calcular_escalas` en `src/gauss.py`). Las filas impares son "pequeñas" (s(i) entre 10⁻⁵ y 10⁻²) y las pares son "grandes" (entre 10³ y 10⁶). Entre F5 (8.05×10⁻⁵) y F6 (9.67×10⁵) hay casi **diez órdenes de magnitud**.
  
 ### Qué hace difícil este sistema
  
@@ -83,17 +61,15 @@ Se hacen **11 pasos** (k = 1, …, 11) y quedan los **66 elementos bajo la diago
  
 ### Por qué no nos pasamos del mínimo
  
-- **Un multiplicador por fila.** m(i,k) se calcula una sola vez y se usa en toda la fila y también en b. Si se recalculara por columna, el costo subiría a ≈ 1750 flops.
-- **No tocamos lo que ya es cero.** El barrido parte en la columna k+1. El elemento a(i,k) no se calcula como a(i,k) − m·a(k,k), porque por cómo se construye m ese resultado es cero. Por eso lo ponemos en `0.0` directo. Así además quedan ceros **exactos** y no un "casi cero" por redondeo.
-- **Sin inversa y una sola factorización.** Nunca calculamos A⁻¹. Guardamos L (los multiplicadores), U (la matriz triangular) y el orden de las filas, y con eso la función `resolver_con_lu` resuelve con **otro** vector b sin volver a eliminar. Eso lo usamos en el refinamiento iterativo (sección 8), y cada pasada cuesta solo **276 flops**.
-### Por qué pivoteo *escalado* y no solo parcial
-El pivoteo parcial normal elige el mayor |a(i,k)|, y en esta matriz siempre ganarían las filas grandes (10⁵) solo por estar escritas en una escala mayor. El escalado divide por s(i), o sea, compara cada candidato **con el tamaño de su propia fila**. Así una fila de 10⁻⁵ no pierde injustamente frente a una de 10⁵.
+- **Un multiplicador por fila**, reutilizado en toda la fila y en b (recalcularlo por columna costaría ≈ 1750 flops).
+- **No tocamos lo que ya es cero:** el barrido parte en k+1 y a(i,k) se asigna 0.0 directo, así quedan ceros exactos.
+- **Sin inversa y una sola factorización:** guardamos L, U y el orden de filas; `resolver_con_lu` los reutiliza en el refinamiento (276 flops por pasada).
  
 ## 4. Conteo de operaciones
  
 **Convención:** 1 flop = 1 operación aritmética elemental (+, −, ×, ÷). Las comparaciones, las divisiones |a(i,k)|/s(i) del pivoteo y los intercambios de filas **no** son flops: se cuentan aparte como **sobrecosto de estabilidad**.
  
-Los números salen de contadores que están **dentro del código**, justo al lado de cada operación (`multdiv_por_paso`, `sumres_por_paso`, etc. en `src/gauss.py`). No salen de una fórmula escrita a mano. La tabla completa también queda en `resultados/conteo_flops.md`.
+Los números salen de contadores dentro de `src/gauss.py`, al lado de cada operación (no de una fórmula). La tabla completa queda en `resultados/conteo_flops.md`.
  
 | Paso k | Filas bajo el pivote | Mult/Div | Sum/Res | Flops del paso |
 |---:|---:|---:|---:|---:|
@@ -112,19 +88,7 @@ Los números salen de contadores que están **dentro del código**, justo al lad
 | Sustitución regresiva | | 78 | 66 | 144 |
 | **Total** | | **716** | **638** | **1354** |
  
-### Cómo se lee un paso
-En el paso k quedan r = 12 − k filas bajo el pivote. Cada una cuesta:
-- 1 división (el multiplicador),
-- r multiplicaciones y r restas (columnas k+1 a 12),
-- 1 multiplicación y 1 resta (el vector b).
-Por ejemplo, en el paso 1 (r = 11): mult/div = 11 × (1 + 11 + 1) = **143** y sum/res = 11 × (11 + 1) = **132**. 
- 
-### Comparación con la cota
- 
-| Estrategia | Flops de la cota | Nuestros flops | Diferencia | ¿Dentro de ±10 %? |
-|---|---:|---:|---:|---|
-| Eliminación densa bien hecha | ≈ 1486 | 1354 | −8.9 % | Sí |
-| + pivoteo parcial escalado | ≈ 1486 + 66 comparaciones | 1354 + sobrecosto aparte | −8.9 % | Sí |
+Por ejemplo, en el paso 1 hay 11 filas bajo el pivote: 11 × (1 + 11 + 1) = 143 mult/div y 11 × (11 + 1) = 132 sum/res. **Total: 1354 flops, −8.9 % de la cota ≈ 1486 (dentro del ±10 %).**
  
 La diferencia con 1486 es exactamente **132 flops** (66 multiplicaciones + 66 restas). La cota del enunciado incluye calcular a(i,k) − m·a(k,k) en la columna k. Nosotros no lo calculamos porque sabemos que da cero y lo asignamos directo: 1354 + 132 = 1486. Los flops son **los mismos en las dos corridas**, porque el pivoteo no agrega aritmética de eliminación.
  
@@ -135,7 +99,6 @@ La diferencia con 1486 es exactamente **132 flops** (66 multiplicaciones + 66 re
 | Sin pivoteo | 0 | 0 | 0 |
 | Pivoteo parcial escalado | 198 (132 para las escalas + 66 de búsqueda) | 77 | 8 |
  
-Las 66 comparaciones de búsqueda coinciden con las "66 comparaciones" que da el enunciado. Las 132 extra son de calcular las 12 escalas s(i) una sola vez al inicio.
  
 ## 5. Análisis de mantisa y pivoteo
  
@@ -148,23 +111,7 @@ Corrimos **el mismo código** dos veces, cambiando solo `con_pivoteo`. El error 
  
 - **ρ** = (número más grande que apareció durante la eliminación) / (número más grande de A original).
 - **Bits perdidos** = 53 − bits correctos, con bits correctos = −log₂(peor error por componente).
-### Dígitos correctos de cada incógnita
- 
-| Incógnita | Sin pivoteo | Con pivoteo escalado |
-|---|---:|---:|
-| x₁ | 10.2 | 13.1 |
-| x₂ | 9.3 | 12.3 |
-| x₃ | 7.1 | 10.1 |
-| x₄ | 8.6 | 11.6 |
-| x₅ | 10.0 | 12.9 |
-| x₆ | 7.1 | 10.1 |
-| x₇ | 9.6 | 12.5 |
-| x₈ | 8.8 | 11.8 |
-| x₉ | 9.8 | 12.7 |
-| x₁₀ | 9.9 | 12.9 |
-| x₁₁ | 8.9 | 11.9 |
-| x₁₂ | 9.6 | 12.5 |
- 
+
 Las peores siempre son x₃ y x₆, que son las incógnitas más chicas (≈ 10⁻³): un mismo error absoluto pesa mucho más en ellas en términos relativos.
  
 ### ¿Por qué el pivote a(1,1) es inaceptable?
@@ -173,16 +120,7 @@ Con a(1,1) = 1.3407×10⁻⁸ como pivote, los multiplicadores del paso 1 se dis
 Después, la matriz crece unas 2.6×10³ veces (≈ 11 bits más) y el error se sigue acumulando. Al final se pierden ≈ 29 bits en el peor componente y solo quedan **7 dígitos correctos** en x₃ y x₆. Lo peligroso es que el sistema "se resuelve igual", porque ningún pivote es cero, y el resultado se ve razonable aunque tenga la mitad de los dígitos malos.
  
 ### ¿Qué hace el pivoteo escalado?
-En la columna 1, la fila 1 tiene |a(1,1)|/s(1) ≈ 1.45×10⁻⁴ (la peor de todas) y la fila 8 tiene razón 1.0 (su elemento de la columna 1 es el más grande de su fila). Por eso el primer pivote es **F8**. El orden completo de pivotes queda:
- 
-| Paso | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Fila original usada | F8 | F2 | F1 | F6 | F9 | F11 | F12 | F5 | F4 | F10 | F3 | F7 |
- 
-La fila 1 se usa recién en el paso 3, cuando ya no compite con filas de 10⁵ en su columna. La fila 7 (la casi dependiente) queda **al final**.
- 
-### ¿Y el multiplicador de 2.47×10⁹ con pivoteo?
-Parece grande, pero no es un problema. El escalado a veces elige como pivote una fila pequeña (de 10⁻⁵) y la usa para eliminar en una fila grande (de 10⁵). Ese multiplicador es solo la razón entre las escalas de las dos filas, así que m·a(k,j) queda del mismo tamaño que la fila que lo recibe. Lo que importa es que la matriz casi no crece (**ρ = 1.78**), y por eso la pérdida de bits queda controlada.
+Compara |a(i,k)|/s(i): en la columna 1, F1 tiene 1.45×10⁻⁴ (la peor) y F8 tiene 1.0, así que el primer pivote es **F8**. Orden de pivotes: F8, F2, F1, F6, F9, F11, F12, F5, F4, F10, F3, F7. La fila 7 (la casi dependiente) queda al final. Aunque el multiplicador máximo es 2.47×10⁹, es solo la razón entre escalas de fila: la matriz casi no crece (ρ = 1.78).
  
 ### Resumen de la comparación
 El pivoteo escalado no cambia los flops (1354 en las dos), pero reduce el factor de crecimiento de 2641 a 1.78 y el error relativo unas **880 veces** (de 2.08×10⁻¹⁰ a 2.36×10⁻¹³). Se pasa de 7 a 10 dígitos correctos en la peor incógnita: **≈ 3 dígitos ≈ 10 bits** recuperados, a cambio de 198 comparaciones, 77 divisiones de escala y 8 intercambios.
@@ -201,7 +139,6 @@ La cota clásica dice que ‖δx‖/‖x‖ ≲ κ(A)·ε ≈ 6.85×10⁻³, o s
 ### ¿Por qué la cota es pesimista aquí?
 1. **Es el peor caso.** La cota supone que los errores de redondeo se acomodan justo en la dirección que más se amplifica, y eso casi nunca pasa.
 2. **Gran parte de κ viene de las escalas, no de la matriz "en sí".** Si dividimos cada fila por su escala s(i) (equilibrar filas), el número de condición baja de 3.08×10¹³ a **≈ 8.1×10³**. Con ese κ, la cota da ≈ 8.1×10³ · 2.22×10⁻¹⁶ ≈ 1.8×10⁻¹² → **≈ 11–12 dígitos**, que calza con lo que obtuvimos. El pivoteo escalado trabaja justamente sobre esa parte.
-3. **El residuo decide.** La cota se construye con el peor caso; lo que de verdad dice cuán buena es la solución es el residuo y la comparación con la solución exacta (sección 8).
 ### Casi dependencia de la fila 7
 Ajustando F7 como combinación de F3 y F5 por mínimos cuadrados (cálculo hecho aparte con numpy; no forma parte de `main.py`):
  
@@ -248,9 +185,8 @@ Con ese residuo resolvemos **A·d = r reutilizando L y U** (`resolver_con_lu`, s
 |---|---:|---:|
 | Error relativo ‖x̂ − x‖∞/‖x‖∞ | 2.36×10⁻¹³ | 6.0×10⁻¹⁷ |
 | Dígitos correctos (mínimo) | 10.1 | 16.1 |
-| ‖r‖∞ | 2.29×10⁻¹⁰ | 2.60×10⁻¹⁰ |
  
-El error bajó unas **4000 veces**, pero el residuo **no bajó**. Esto no significa que empeoró: ‖r‖∞ lo domina la fila 6, que tiene escala 10⁶. Ahí, el solo hecho de guardar x en `float64` ya produce un residuo de ≈ s(6)·‖x‖·ε ≈ 10⁻¹⁰. O sea, llegamos al **piso de la doble precisión** y el residuo no puede bajar más aunque x sea casi exacta. Por eso el residuo solo, sin mirar el error, puede engañar.
+El error bajó unas **4000 veces**, pero el residuo no: ‖r‖∞ lo domina la fila 6 (escala 10⁶), donde solo guardar x en `float64` ya da ≈ 10⁻¹⁰. Llegamos al piso de la doble precisión.
  
 ### Control con biblioteca
 `numpy.linalg.solve` (pivoteo parcial sin escalar) da un error relativo de 2.55×10⁻¹³ (`residuo.txt`), parecido al nuestro (2.36×10⁻¹³). Lo usamos solo como control: la solución reportada es la de nuestra implementación.
@@ -260,16 +196,12 @@ El error bajó unas **4000 veces**, pero el residuo **no bajó**. Esto no signif
 **¿Qué compromiso costo/exactitud elegimos y por qué?**
 Pivoteo parcial escalado + una pasada de refinamiento iterativo. La eliminación cuesta **1354 flops** (−8.9 % de la cota): un multiplicador por fila, sin volver a la subdiagonal y sin inversa. La estabilidad cuesta 198 comparaciones, 77 divisiones de escala y 8 intercambios, y no agrega ningún flop a la eliminación. A cambio, el peor dígito pasa de **7 a 10**, y con una pasada de refinamiento (276 flops más) llegamos al límite del `float64` (error 6.0×10⁻¹⁷). La secuencia más barata (sin pivoteo) es justamente la que pierde ≈ 29 bits.
  
-**¿Qué pasó con el pivote minúsculo?**
-a(1,1) = 1.34×10⁻⁸ genera multiplicadores de 10¹³ y destruye entre 10 y 13 bits por fila en el primer paso. No se puede aceptar aunque no sea cero: el sistema se resuelve igual, pero con la mitad de los dígitos malos.
  
 **¿Qué haríamos distinto con n = 1000?**
-- La eliminación costaría ≈ 2n³/3 ≈ 6.7×10⁸ flops, y el pivoteo solo ≈ n² ≈ 10⁶ comparaciones (≈ 0.15 %). Pivotear seguiría siendo "gratis" en proporción.
-- Usaríamos una librería optimizada (LU por bloques de LAPACK) en vez de bucles de Python, porque con listas sería lentísimo.
-- Equilibraríamos las filas una vez al inicio en vez de dividir por s(i) en cada búsqueda.
-- Estimaríamos κ con un método barato (tipo Hager) en vez de calcular todos los valores singulares.
-- La traza completa de cada paso ya no sería práctica: guardaríamos solo ρ, los pivotes y el multiplicador máximo por paso.
-- El residuo en precisión extendida con `Decimal` sería lento para n = 1000; lo calcularíamos con doble-doble o con precisión mixta.
+- Costaría ≈ 6.7×10⁸ flops y el pivoteo solo ≈ 10⁶ comparaciones (0.15 %), así que pivotear seguiría siendo barato.
+- Usaríamos LU por bloques de una librería optimizada (LAPACK) en vez de bucles de Python, y equilibraríamos las filas una vez al inicio.
+- Guardaríamos solo ρ, los pivotes y el multiplicador máximo por paso, no la traza completa.
+
 ## 10. Reproducibilidad
  
 | Cosa | Versión |
